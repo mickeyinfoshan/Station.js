@@ -1,0 +1,10 @@
+{
+  "name": "flux",
+  "description": "Flux architecture for complex WEB applications. ",
+  "version": "0.0.1",
+  "keywords": [
+    "flux",
+    "dispatcher",
+    "undirectional"
+  ]
+}
