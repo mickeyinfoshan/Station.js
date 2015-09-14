@@ -6,5 +6,11 @@
     "flux",
     "dispatcher",
     "undirectional"
-  ]
+  ],
+  "devDependencies": {
+    "es6-promise": "^3.0.2",
+    "es6-set": "^0.1.1",
+    "events": "^1.0.2",
+    "object-assign": "^4.0.1"
+  }
 }

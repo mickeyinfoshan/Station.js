@@ -1,9 +1,13 @@
-var DispatcherBase = function() {
+let assign = require('object-assign');
+let Promise = require('es6-promise');
+let Set = require('es6-set');
+
+let DispatcherBase = function() {
 	this.registered = [] ;
 	this.prioritySet = new Set();
 };
 
-DispathcerBase.prototype = {
+DispatcherBase.prototype = assign({},DispatcherBase.prototype,{
 	//处理注册请求
 	register : function(registerRequest) {
 		var priority = registerRequest.priority || 0;
@@ -31,4 +35,6 @@ DispathcerBase.prototype = {
 			new Error("Error during dispatching");
 		});
 	}
-};
+});
+
+export default DispatcherBase;
