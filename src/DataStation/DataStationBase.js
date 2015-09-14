@@ -1,8 +1,23 @@
+/*
+	@author : Mickey
+	@email : mickey.in.foshan@gmail.com
+	****************************************
+	DataStation is a core concept. 
+	An undirectional application is like a tree
+	and a dataStation is like a node of the tree.
+	A dataStation take the responsibility to receive
+	data, process data, and then dispatch the processed
+	data to next dataStations.
+	Everitything can be a dataStation. Models, views and 
+	controllers in MVC can be dataStations. Dispatchers
+	and stores in Flux can be dataStations.
+
+*/
 var Stream = require("stream");
 var assign = require("object-assign");
 
 var DataStationBase = function() {
-	this.sources = [];
+	this.sources = []; //for the future use
 	this.destinations = [];
 	this.handlers = {};
 	this.receiveStream = new Stream();
@@ -20,11 +35,15 @@ var DataStationBase = function() {
 DataStationBase.prototype = assign({},DataStationBase,{
 	addSource : function(dataStation) {
 		dataStation.addDestination(this);
-		this.sources.push(dataStation);
+		if(this.sources.indexOf(dataStation) < 0){
+			this.sources.push(dataStation);
+		}		
 	},
 	addDestination : function(dataStation) {
 		dataStation.addSource(this);
-		this.destinations.add(dataStation;)
+		if(this.destinations.indexOf(dataStation) < 0){
+			this.destinations.push(dataStation);
+		}	
 	},
 	deliver : function(data, dataStation, callback) {
 		callback = callback || function(){return true;};
@@ -61,7 +80,8 @@ DataStationBase.prototype = assign({},DataStationBase,{
 		return true;
 	},
 
-	//deliver the data to all destinations
+	//dispatch the data to all destinations
+	//TODO : dispatch the data to certain destination
 	dispatch : function(data,callback) {
 		var _this = this;
 		callback = callback || function(){return true};
