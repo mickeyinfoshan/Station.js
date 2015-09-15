@@ -143,4 +143,4 @@ DataStationBase.prototype = assign({},DataStationBase,{
 	}
 });
 
-export default DataStationBase;
+exports default DataStationBase;
