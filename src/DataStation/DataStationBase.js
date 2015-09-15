@@ -29,6 +29,10 @@
 	If the return value doesn't have 'dataType' attribute, 
 	the origin dataType will add to it.
 */
+
+'use strict';
+
+
 var Stream = require("stream");
 var assign = require("object-assign");
 
@@ -68,7 +72,11 @@ DataStationBase.prototype = assign({},DataStationBase,{
 		});
 
 	},
-
+	removeSource : function(dataStation) {
+		dataStation.removeDestination(this);
+		this.sources[dataStation] = null;
+		delete this.sources[dataStation];
+	},
 	//shouldn't invoke by users, this is
 	// a private method
 	addDestination : function(dataStation) {
@@ -76,21 +84,31 @@ DataStationBase.prototype = assign({},DataStationBase,{
 			this.destinations.push(dataStation);
 		}	
 	},
+	removeDestination : function(dataStation) {
+		var index = this.destinations.indexOf(dataStation);
+		this.destinations.splice(index,1);
+	},
+
+	//pipe the data to another dataStation
 	deliver : function(data, dataStation, callback) {
 		callback = callback || function(){return true;};
 		var receiveStream = dataStation.getReceiveStream(this);
 		if(!receiveStream) {
 			throw "receive stream not found";
 		}
-		var sourceStream = this.makeSourceStream();
+		var outputStream = this.makeOutputStream();
 		var jsonData = JSON.stringify(data);
-		return sourceStream.write(jsonData,'utf-8',function(){
-			sourceStream.pipe(receiveStream);
-			sourceStream.on("end",callback);
+		return outputStream.write(jsonData,'utf-8',function(){
+			outputStream.pipe(receiveStream);
+			outputStream.on("end",callback);
 		});
 	},
-	makeSourceStream : function() {
-		return new Stream();
+
+	//create an temperary stream for output 
+	makeOutputStream : function() {
+		var stream = new Stream();
+		stream.writable = true;
+		return stream;
 	},
 	getReceiveStream : function(dataStation) {
 		return this.sources[dataStation].stream;
@@ -143,4 +161,4 @@ DataStationBase.prototype = assign({},DataStationBase,{
 	}
 });
 
-exports default DataStationBase;
+module.exports = DataStationBase;
