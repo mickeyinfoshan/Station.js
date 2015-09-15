@@ -1,7 +1,9 @@
 /*
 	@author : Mickey
 	@email : mickey.in.foshan@gmail.com
+
 	****************************************
+
 	DataStation is a core concept. 
 	An undirectional application is like a tree
 	and a dataStation is like a node of the tree.
@@ -11,7 +13,15 @@
 	Everitything can be a dataStation. Models, views and 
 	controllers in MVC can be dataStations. Dispatchers
 	and stores in Flux can be dataStations.
-
+	A dataStation can have several handlers dealing
+	with a certain dataType. 
+	When data comes, a dataStation will choose the 
+	corresponding handler to process the data.
+	If no corresponding handler found, do nothing.
+	If a handler returns value, then the dataStation will
+	dispatch the return value. Otherwise, nothing more to do.
+	If the return value doesn't have 'dataType' attribute, 
+	the origin dataType will add to it.
 */
 var Stream = require("stream");
 var assign = require("object-assign");
@@ -20,36 +30,54 @@ var DataStationBase = function() {
 	this.sources = []; //for the future use
 	this.destinations = [];
 	this.handlers = {};
-	this.receiveStream = new Stream();
-	this.receiveStream.readable = true;
-	this.dataBuffer = "";
-	this.receiveStream.on("data",function(chunk) {
-		this.dataBuffer += chunk;
-	});
-	this.receiveStream.on("end", function() {
-		//TODO : parse data to JSON
-		this.process(this.dataBuffer);
-	});
+	this.dataContainer = null;
+	
 };
 
 DataStationBase.prototype = assign({},DataStationBase,{
 	addSource : function(dataStation) {
+		if(this.destinations.indexOf(dataStation) >= 0) {
+			//a data station shouldn't be the source and destination 
+			//at the same time for the same data station, which will 
+			//cause a curse with no end
+			throw "Curse data flow";
+		}
 		dataStation.addDestination(this);
-		if(this.sources.indexOf(dataStation) < 0){
-			this.sources.push(dataStation);
-		}		
+		this.sources[dataStation] = {
+			dataStation : dataStation,
+			stream : new Stream(),
+			dataBuffer : ""
+		};
+		var source = this.sources[dataStation];
+		source.stream.readable = true;
+		source.stream.on("data", function(chunk){
+			source.dataBuffer += chunk;
+		});
+		var thisStation = this;
+		source.stream.on("end", function(){
+			var data = JSON.parse(this.dataBuffer);
+			this.dataBuffer = ""; //reset the data buffer
+			thisStation.process(data);
+		});
+
 	},
+
+	//shouldn't invoke by users, this is
+	// a private method
 	addDestination : function(dataStation) {
-		dataStation.addSource(this);
 		if(this.destinations.indexOf(dataStation) < 0){
 			this.destinations.push(dataStation);
 		}	
 	},
 	deliver : function(data, dataStation, callback) {
 		callback = callback || function(){return true;};
-		var receiveStream = dataStation.getReceiveStream();
+		var receiveStream = dataStation.getReceiveStream(this);
+		if(!receiveStream) {
+			throw "receive stream not found";
+		}
 		var sourceStream = this.makeSourceStream();
-		return sourceStream.write(data,'utf-8',function(){
+		var jsonData = JSON.stringify(data);
+		return sourceStream.write(jsonData,'utf-8',function(){
 			sourceStream.pipe(receiveStream);
 			sourceStream.on("end",callback);
 		});
@@ -57,32 +85,42 @@ DataStationBase.prototype = assign({},DataStationBase,{
 	makeSourceStream : function() {
 		return new Stream();
 	},
-	getReceiveStream : function() {
-		return this.receiveStream;
+	getReceiveStream : function(dataStation) {
+		return this.sources[dataStation].stream;
 	},
-	addHandlers : function(dataType, handler) {
-		this.handlers[dataType] = this.handlers[dataType] || [];
-		this.handlers[dataType].push(handler);
+	addHandler : function(dataType, handler) {
+		//adding the handler of data type existed
+		//will override the origin one
+		this.handlers[dataType] = handler;
 	},
 
 	//process the data received
-	//TODO : serialize return values of handlers to JSON
 	process : function(data,callback) {
-		var handlers = this.handlers[dataType] || [];
+		
+		var handler = this.handlers[data.dataType];
+		//if the handler of such data type doesn't exist, then 
+		//do nothing
+		if(!handler) {
+			return;
+		}
+
+		//handle the data
+		processedData = handler(data);
+		if(processedData && processedData.dataType == undefined){
+			processedData.dataType = data.dataType;
+		}
+		//default callback is this.dispatch
 		callback = callback || this.dispatch;
-		var promises = handlers.map(function(handler){
-			return Promise.resolve(handler(data));
-		});
-		Promise.all(promises).then(callback,function(){
-			throw "Error during processing";
-		});
-		this.dataBuffer = "";
-		return true;
+		return callback(processedData);
 	},
 
 	//dispatch the data to all destinations
-	//TODO : dispatch the data to certain destination
 	dispatch : function(data,callback) {
+		//If the handler didn't produce any data, 
+		//do nothing.
+		if(!data) {
+			return;
+		}
 		var _this = this;
 		callback = callback || function(){return true};
 		this.promises = [];
