@@ -24,7 +24,8 @@
 	corresponding handler to process the data.
 	If no corresponding handler found, do nothing.
 	If a handler returns value, then the data station will
-	dispatch the return value to all data destinations of it. Otherwise, nothing more to do.
+	dispatch the return value to all data destinations of it. 
+	Otherwise, nothing more to do.
 	If the return value doesn't have 'dataType' attribute, 
 	the origin dataType will add to it.
 */
@@ -36,7 +37,6 @@ var DataStationBase = function() {
 	this.destinations = [];
 	this.handlers = {};
 	this.dataContainer = null;
-	
 };
 
 DataStationBase.prototype = assign({},DataStationBase,{

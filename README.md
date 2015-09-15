@@ -2,7 +2,7 @@
 
 ---
 
-**PipeFlux** is a Flux-like architecture for more complex applications. Let's consider the architecture of an application as a directed graph, which including nodes and links. Everything in an application that process/store data is a node in the graph and the connections between them are links.
+**PipeFlux** is a Flux-like architecture for more complex applications. Let's consider the architecture of an application as a directed graph, which including nodes and links. Everything in an application that process/store data is a node of the graph and the connections between them are links.
 In **PipeFlux**, we consider a node as a data station and a link as a pipe where stream runs through.
 
 #DataStation
@@ -11,7 +11,7 @@ In **PipeFlux**, we consider a node as a data station and a link as a pipe where
 
 DataStation is a core concept in PipeFlux. 
 
-An undirectional application is like a tree	and a data station is like a node of the tree. A data station take the responsibility to receive data, process data, and then dispatch the processed data to the next.
+An undirectional application is like a tree(graph)	and a data station is like a node of the tree. A data station take the responsibility to receive data, process data, and then dispatch the processed data to the next.
 
 Everything can be a data station. Models, views and controllers in MVC can be data stations. Dispatchers and stores in Flux can be data stations.
 
