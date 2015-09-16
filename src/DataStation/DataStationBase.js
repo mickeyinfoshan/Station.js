@@ -36,6 +36,8 @@
 var Stream = require("stream");
 var assign = require("object-assign");
 
+//TODO: change sources, handlers to Map
+//and change destinations to Set
 var DataStationBase = function() {
 	this.sources = {};
 	this.destinations = [];
@@ -61,6 +63,7 @@ DataStationBase.prototype = assign({},DataStationBase,{
 		};
 		var source = this.sources[dataStation];
 		source.stream.readable = true;
+		source.stream.writable = true;
 		source.stream.on("data", function(chunk){
 			source.dataBuffer += chunk;
 		});
@@ -77,6 +80,16 @@ DataStationBase.prototype = assign({},DataStationBase,{
 		this.sources[dataStation] = null;
 		delete this.sources[dataStation];
 	},
+	hasSource : function(dataStation) {
+		return this.sources[dataStation]?true:false;
+	},
+	getSourcesCount : function() {
+		var count = 0;
+		for(var key in this.sources) {
+			count++;
+		}
+		return count;
+	},
 	//shouldn't invoke by users, this is
 	// a private method
 	addDestination : function(dataStation) {
@@ -88,26 +101,30 @@ DataStationBase.prototype = assign({},DataStationBase,{
 		var index = this.destinations.indexOf(dataStation);
 		this.destinations.splice(index,1);
 	},
+	hasDestination : function(dataStation) {
+		return this.destinations.indexOf(dataStation) >= 0;
+	},
+	getDestinationsCount : function() {
+		return this.destinations.length;
+	},
 
 	//pipe the data to another dataStation
-	deliver : function(data, dataStation, callback) {
-		callback = callback || function(){return true;};
+	deliver : function(data, dataStation) {
+		//callback = callback || function(){return true;};
 		var receiveStream = dataStation.getReceiveStream(this);
 		if(!receiveStream) {
 			throw "receive stream not found";
 		}
-		var outputStream = this.makeOutputStream();
 		var jsonData = JSON.stringify(data);
-		return outputStream.write(jsonData,'utf-8',function(){
-			outputStream.pipe(receiveStream);
-			outputStream.on("end",callback);
-		});
+		var outputStream = this.makeOutputStream(jsonData);
+		outputStream.pipe(receiveStream);
 	},
 
 	//create an temperary stream for output 
-	makeOutputStream : function() {
-		var stream = new Stream();
-		stream.writable = true;
+	makeOutputStream : function(data) {
+		var stream = new Stream.Readable();
+		stream.push(data);
+		stream.push(null);
 		return stream;
 	},
 	getReceiveStream : function(dataStation) {
@@ -118,7 +135,10 @@ DataStationBase.prototype = assign({},DataStationBase,{
 		//will override the origin one
 		this.handlers[dataType] = handler;
 	},
-
+	removeHandler : function(dataType) {
+		this.handlers[dataType] = null;
+		delete this.handlers[dataType];
+	},	
 	//process the data received
 	process : function(data,callback) {
 		
@@ -138,7 +158,9 @@ DataStationBase.prototype = assign({},DataStationBase,{
 		callback = callback || this.dispatch;
 		return callback(processedData);
 	},
-
+	hasHandler : function(dataType) {
+		return this.handlers[dataType]?true:false;
+	},
 	//dispatch the data to all destinations
 	dispatch : function(data,callback) {
 		//If the handler didn't produce any data, 
