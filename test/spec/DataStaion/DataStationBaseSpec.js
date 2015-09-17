@@ -1,3 +1,7 @@
+/*
+	tests for DataStationBase 
+*/
+
 describe("DataStationBase", function() {
 
 	var DataStationBase = require("../../../src/DataStation/DataStationBase.js");
@@ -61,6 +65,12 @@ describe("DataStationBase", function() {
 		expect(dest.dataContainer).toBe("hello!");
 	});
 
+	it("should do nothing if the corresponding handler not found", function(){
+		dest.addHandler(handler.bind(dest));
+		var result = dest.process(data);
+		expect(dest.dataContainer).not.toBe("hello!");	
+	});
+
 	it("should override the handler of the same _type", function(){
 		dest.addHandler(handler.bind(dest),"say");
 		dest.addHandler(function(data){
@@ -83,7 +93,7 @@ describe("DataStationBase", function() {
 		}).toThrow(Error("Receiver not found"));
 	});
 
-	it("should dispatch the data to its destinations", function(){
+	it("should dispatch the data to its destinations if the handler has return value", function(){
 		dest.addHandler(handler.bind(dest),"say");
 		var dest2 = new DataStationBase();
 		dest2.addHandler(function(data){
@@ -105,6 +115,25 @@ describe("DataStationBase", function() {
 		source.dispatch(data);
 		expect(dest.dataContainer).toBe("hello!");
 		expect(dest2.dataContainer).toBe("hello!@");
+	});
+
+	it("should not dispatch anything if there's no return value", function(){
+		
+		//handler return nothing
+		dest.addHandler(function(data){
+			this.dataContainer = data.content + "!";
+		}.bind(dest),"say");		
+
+		var dest2 = new DataStationBase();
+		dest2.addHandler(function(data){
+			this.dataContainer = data.content + "@";
+		}.bind(dest2),"say");
+		dest2.addSource(dest,"say");
+
+		source.dispatch(data);
+
+		expect(dest.dataContainer).toBe("hello!");
+		expect(dest2.dataContainer).not.toBe("hello!@");
 	});
 });
 

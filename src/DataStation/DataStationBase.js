@@ -14,8 +14,8 @@
 	controllers in MVC can be data stations. Dispatchers
 	and stores in Flux can be data stations.
 	A data station can have several data sources. Sources can be 
-	added through 'addSource' method which will create a stream 
-	waiting for data. 
+	added through 'addSource' method, 
+	which will create a receiver waiting for data. 
 	A data station can have one or more data destinations. When a data station
 	add an another data station as a data source, this data station will be a data
 	destination of the other one.
@@ -49,7 +49,7 @@ var DataStationBase = function() {
 
 DataStationBase.prototype = assign({},DataStationBase,{
 
-	//adding a data source will create new stream waiting for data 
+	//adding a data source will create an EventEmitter waiting for data 
 	addSource : function(dataStation, _type) {
 		if(this.hasDestination(dataStation)) {
 			//a data station shouldn't be the source and destination 
@@ -57,7 +57,7 @@ DataStationBase.prototype = assign({},DataStationBase,{
 			//cause a curse with no end
 			throw new Error("Curse data flow");
 		}
-		dataStation.addDestination(this);
+		dataStation._addDestination(this);
 		var emitter = new Emitter();
 		_type = _type || DEFAULT_TYPE;
 		emitter.on(_type,this.process.bind(this));
@@ -65,7 +65,7 @@ DataStationBase.prototype = assign({},DataStationBase,{
 
 	},
 	removeSource : function(dataStation) {
-		dataStation.removeDestination(this);
+		dataStation._removeDestination(this);
 		this.$sources.delete(dataStation);
 	},
 	hasSource : function(dataStation) {
@@ -76,13 +76,13 @@ DataStationBase.prototype = assign({},DataStationBase,{
 	},
 	//shouldn't invoke by users, this is
 	// a private method
-	addDestination : function(dataStation) {
+	_addDestination : function(dataStation) {
 		if(this.hasSource(dataStation)){
 			throw new Error('Curse data flow');
 		}
 		this.$destinations.add(dataStation);
 	},
-	removeDestination : function(dataStation) {
+	_removeDestination : function(dataStation) {
 		this.$destinations.delete(dataStation);
 	},
 	hasDestination : function(dataStation) {
