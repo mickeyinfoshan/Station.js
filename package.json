@@ -8,9 +8,14 @@
     "undirectional"
   ],
   "devDependencies": {
+    "es6-map": "^0.1.1",
     "es6-promise": "^3.0.2",
     "es6-set": "^0.1.1",
     "events": "^1.0.2",
+    "jasmine-core": "^2.3.4",
+    "karma": "^0.13.9",
+    "karma-chrome-launcher": "^0.2.0",
+    "karma-jasmine": "^0.3.6",
     "object-assign": "^4.0.1"
   }
 }

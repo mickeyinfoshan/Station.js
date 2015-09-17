@@ -26,8 +26,8 @@
 	If a handler returns value, then the data station will
 	dispatch the return value to all data destinations of it. 
 	Otherwise, nothing more to do.
-	If the return value doesn't have 'dataType' attribute, 
-	the origin dataType will add to it.
+	If the return value doesn't have '_type' attribute, 
+	the origin _type will add to it.
 */
 
 'use strict';
@@ -35,114 +35,89 @@
 
 var Stream = require("stream");
 var assign = require("object-assign");
-
+var Emitter = require("events").EventEmitter;
+var Set = require("es6-set");
+var Map = require("es6-map");
+var DEFAULT_TYPE = require("../Constants/constants.js").DEFAULT_TYPE;
 //TODO: change sources, handlers to Map
 //and change destinations to Set
 var DataStationBase = function() {
-	this.sources = {};
-	this.destinations = [];
-	this.handlers = {};
-	this.dataContainer = null;
+	this.$sources = new Map();
+	this.$destinations = new Set();
+	this.$handlers = new Map();
 };
 
 DataStationBase.prototype = assign({},DataStationBase,{
 
 	//adding a data source will create new stream waiting for data 
-	addSource : function(dataStation) {
-		if(this.destinations.indexOf(dataStation) >= 0) {
+	addSource : function(dataStation, _type) {
+		if(this.hasDestination(dataStation)) {
 			//a data station shouldn't be the source and destination 
 			//at the same time for the same data station, which will 
 			//cause a curse with no end
-			throw "Curse data flow";
+			throw new Error("Curse data flow");
 		}
 		dataStation.addDestination(this);
-		this.sources[dataStation] = {
-			dataStation : dataStation,
-			stream : new Stream(),
-			dataBuffer : ""
-		};
-		var source = this.sources[dataStation];
-		source.stream.readable = true;
-		source.stream.writable = true;
-		source.stream.on("data", function(chunk){
-			source.dataBuffer += chunk;
-		});
-		var thisStation = this;
-		source.stream.on("end", function(){
-			var data = JSON.parse(this.dataBuffer);
-			this.dataBuffer = ""; //reset the data buffer
-			thisStation.process(data);
-		});
+		var emitter = new Emitter();
+		_type = _type || DEFAULT_TYPE;
+		emitter.on(_type,this.process.bind(this));
+		this.$sources.set(dataStation, emitter);
 
 	},
 	removeSource : function(dataStation) {
 		dataStation.removeDestination(this);
-		this.sources[dataStation] = null;
-		delete this.sources[dataStation];
+		this.$sources.delete(dataStation);
 	},
 	hasSource : function(dataStation) {
-		return this.sources[dataStation]?true:false;
+		return this.$sources.has(dataStation);
 	},
 	getSourcesCount : function() {
-		var count = 0;
-		for(var key in this.sources) {
-			count++;
-		}
-		return count;
+		return this.$sources.size;
 	},
 	//shouldn't invoke by users, this is
 	// a private method
 	addDestination : function(dataStation) {
-		if(this.destinations.indexOf(dataStation) < 0){
-			this.destinations.push(dataStation);
-		}	
+		if(this.hasSource(dataStation)){
+			throw new Error('Curse data flow');
+		}
+		this.$destinations.add(dataStation);
 	},
 	removeDestination : function(dataStation) {
-		var index = this.destinations.indexOf(dataStation);
-		this.destinations.splice(index,1);
+		this.$destinations.delete(dataStation);
 	},
 	hasDestination : function(dataStation) {
-		return this.destinations.indexOf(dataStation) >= 0;
+		return this.$destinations.has(dataStation);
 	},
 	getDestinationsCount : function() {
-		return this.destinations.length;
+		return this.$destinations.size;
 	},
 
-	//pipe the data to another dataStation
+	//deliver the data to another dataStation
 	deliver : function(data, dataStation) {
-		//callback = callback || function(){return true;};
-		var receiveStream = dataStation.getReceiveStream(this);
-		if(!receiveStream) {
-			throw "receive stream not found";
+		var receiver = dataStation.getReceiver(this);
+		if(!receiver) {
+			throw new Error("Receiver not found");
 		}
-		var jsonData = JSON.stringify(data);
-		var outputStream = this.makeOutputStream(jsonData);
-		outputStream.pipe(receiveStream);
+		receiver.emit(data._type,data);
 	},
 
-	//create an temperary stream for output 
-	makeOutputStream : function(data) {
-		var stream = new Stream.Readable();
-		stream.push(data);
-		stream.push(null);
-		return stream;
+	getReceiver : function(dataStation) {
+		return this.$sources.get(dataStation);
 	},
-	getReceiveStream : function(dataStation) {
-		return this.sources[dataStation].stream;
-	},
-	addHandler : function(dataType, handler) {
+	addHandler : function(handler,_type) {
 		//adding the handler of data type existed
 		//will override the origin one
-		this.handlers[dataType] = handler;
+		_type = _type || DEFAULT_TYPE;
+		this.$handlers.set(_type, handler);
 	},
-	removeHandler : function(dataType) {
-		this.handlers[dataType] = null;
-		delete this.handlers[dataType];
+	removeHandler : function(_type) {
+		_type = _type || DEFAULT_TYPE;
+		this.$handlers.delete(_type);
 	},	
 	//process the data received
 	process : function(data,callback) {
-		
-		var handler = this.handlers[data.dataType];
+		data._type = data._type || DEFAULT_TYPE;
+		var handler = this.$handlers.get(data._type);
 		//if the handler of such data type doesn't exist, then 
 		//do nothing
 		if(!handler) {
@@ -150,36 +125,27 @@ DataStationBase.prototype = assign({},DataStationBase,{
 		}
 
 		//handle the data
-		processedData = handler(data);
-		if(processedData && processedData.dataType == undefined){
-			processedData.dataType = data.dataType;
+		var processedData = handler(data);
+		if(processedData && processedData._type == undefined){
+			processedData._type = data._type;
 		}
 		//default callback is this.dispatch
 		callback = callback || this.dispatch;
+		callback = callback.bind(this);
 		return callback(processedData);
 	},
-	hasHandler : function(dataType) {
-		return this.handlers[dataType]?true:false;
+	hasHandler : function(_type) {
+		_type = _type || DEFAULT_EVENT_TYPE;
+		return this.$handlers.has(_type);
 	},
 	//dispatch the data to all destinations
-	dispatch : function(data,callback) {
+	dispatch : function(data) {
 		//If the handler didn't produce any data, 
 		//do nothing.
 		if(!data) {
 			return;
 		}
-		var _this = this;
-		callback = callback || function(){return true};
-		this.promises = [];
-		this.destinations.forEach(function(des,i){
-			_this.deliver(data,des,function(response) {
-				_this.promises[i] = Promise.resolve(response);
-			});
-		});
-		Promise.all(this.promises).then(callback,function(){
-			throw "Error during dispatching";
-		});
-		return true;
+		this.$destinations.forEach(this.deliver.bind(this,data));		
 	}
 });
 
