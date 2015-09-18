@@ -107,6 +107,18 @@ DataStationBase.prototype = assign({},DataStationBase,{
 	addHandler : function(handler,_type) {
 		//adding the handler of data type existed
 		//will override the origin one
+		//`this` needs to be binded when the handler use `this` ,
+		//For example:
+		//  var foo = {
+		// 		func : function(){		        // a method use `this`
+		//	    	...
+		//			...this...
+		//			...
+		// 		}
+		// 	};
+		// 	var ds = new DataStationBase();
+		// 	ds.addHandler(foo.func);			//NOT OK! foo.func won't work as you expect
+		// 	ds.addHandler(foo.func.bind(foo));  //OK
 		_type = _type || DEFAULT_TYPE;
 		this.$handlers.set(_type, handler);
 	},
