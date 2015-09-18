@@ -26,8 +26,8 @@
 	If a handler returns value, then the data station will
 	dispatch the return value to all data destinations of it. 
 	Otherwise, nothing more to do.
-	If the return value doesn't have '_type' attribute, 
-	the origin _type will add to it.
+	If the return value doesn't have '$type' attribute, 
+	the origin $type will add to it.
 */
 
 'use strict';
@@ -50,26 +50,26 @@ var DataStationBase = function() {
 DataStationBase.prototype = assign({},DataStationBase,{
 
 	//adding a data source will create an EventEmitter waiting for data 
-	addSource : function(dataStation, _type) {
-		if(this.hasDestination(dataStation)) {
-			//a data station shouldn't be the source and destination 
-			//at the same time for the same data station, which will 
-			//cause a curse with no end
-			throw new Error("Curse data flow");
-		}
+	addSource : function(dataStation, $type) {
+
 		dataStation._addDestination(this);
 		var emitter = new Emitter();
-		_type = _type || DEFAULT_TYPE;
-		emitter.on(_type,this.process.bind(this));
-		this.$sources.set(dataStation, emitter);
-
+		$type = $type || DEFAULT_TYPE;
+		emitter.on($type,this.process.bind(this));
+		var _types = this.$sources.get(dataStation);
+		_types = _types || new Map();
+		_types.set($type, emitter);
+		this.$sources.set(dataStation, _types);
 	},
 	removeSource : function(dataStation) {
 		dataStation._removeDestination(this);
 		this.$sources.delete(dataStation);
 	},
-	hasSource : function(dataStation) {
-		return this.$sources.has(dataStation);
+	hasSource : function(dataStation,$type) {
+		if(!this.$sources.has(dataStation)){
+			return false;
+		}
+		return this.$sources.get(dataStation).has($type);
 	},
 	getSourcesCount : function() {
 		return this.$sources.size;
@@ -77,9 +77,6 @@ DataStationBase.prototype = assign({},DataStationBase,{
 	//shouldn't invoke by users, this is
 	// a private method
 	_addDestination : function(dataStation) {
-		if(this.hasSource(dataStation)){
-			throw new Error('Curse data flow');
-		}
 		this.$destinations.add(dataStation);
 	},
 	_removeDestination : function(dataStation) {
@@ -94,17 +91,21 @@ DataStationBase.prototype = assign({},DataStationBase,{
 
 	//deliver the data to another dataStation
 	deliver : function(data, dataStation) {
-		var receiver = dataStation.getReceiver(this);
+		var receiver = dataStation.getReceiver(this, data.$type);
 		if(!receiver) {
 			throw new Error("Receiver not found");
 		}
-		receiver.emit(data._type,data);
+		receiver.emit(data.$type, data);
 	},
 
-	getReceiver : function(dataStation) {
-		return this.$sources.get(dataStation);
+	getReceiver : function(dataStation, $type) {
+		var types = this.$sources.get(dataStation);
+		if(!types) {
+			throw new Error("Destination not found");
+		}
+		return types.get($type);
 	},
-	addHandler : function(handler,_type) {
+	addHandler : function(handler,$type) {
 		//adding the handler of data type existed
 		//will override the origin one
 		//`this` needs to be binded when the handler use `this` ,
@@ -119,17 +120,17 @@ DataStationBase.prototype = assign({},DataStationBase,{
 		// 	var ds = new DataStationBase();
 		// 	ds.addHandler(foo.func);			//NOT OK! foo.func won't work as you expect
 		// 	ds.addHandler(foo.func.bind(foo));  //OK
-		_type = _type || DEFAULT_TYPE;
-		this.$handlers.set(_type, handler);
+		$type = $type || DEFAULT_TYPE;
+		this.$handlers.set($type, handler);
 	},
-	removeHandler : function(_type) {
-		_type = _type || DEFAULT_TYPE;
-		this.$handlers.delete(_type);
+	removeHandler : function($type) {
+		$type = $type || DEFAULT_TYPE;
+		this.$handlers.delete($type);
 	},	
 	//process the data received
 	process : function(data,callback) {
-		data._type = data._type || DEFAULT_TYPE;
-		var handler = this.$handlers.get(data._type);
+		data.$type = data.$type || DEFAULT_TYPE;
+		var handler = this.$handlers.get(data.$type);
 		//if the handler of such data type doesn't exist, then 
 		//do nothing
 		if(!handler) {
@@ -138,17 +139,17 @@ DataStationBase.prototype = assign({},DataStationBase,{
 
 		//handle the data
 		var processedData = handler(data);
-		if(processedData && processedData._type == undefined){
-			processedData._type = data._type;
+		if(processedData && processedData.$type == undefined){
+			processedData.$type = data.$type;
 		}
 		//default callback is this.dispatch
 		callback = callback || this.dispatch;
 		callback = callback.bind(this);
 		return callback(processedData);
 	},
-	hasHandler : function(_type) {
-		_type = _type || DEFAULT_EVENT_TYPE;
-		return this.$handlers.has(_type);
+	hasHandler : function($type) {
+		$type = $type || DEFAULT_EVENT_TYPE;
+		return this.$handlers.has($type);
 	},
 	//dispatch the data to all destinations
 	dispatch : function(data) {

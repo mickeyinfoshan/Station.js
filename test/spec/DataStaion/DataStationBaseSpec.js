@@ -8,7 +8,7 @@ describe("DataStationBase", function() {
 	var source;
 	var dest;
 	var data = {
-		_type : "say",
+		$type : "say",
 		content : "hello"
 	};
 
@@ -26,17 +26,15 @@ describe("DataStationBase", function() {
 		dest.addSource(source,"say");
 	});
 
+	it("should not have a source before adding one to it", function(){
+		expect(source.getSourcesCount()).toBe(0);
+	}),
+
 	it("should have a source after adding a source to it",function(){
 		expect(source.hasDestination(dest)).toBe(true);
-		expect(dest.hasSource(source)).toBe(true);
+		expect(dest.hasSource(source, data.$type)).toBe(true);
 		expect(source.getDestinationsCount()).toBe(1);
 		expect(dest.getSourcesCount()).toBe(1);
-	});
-
-	it("should not add a source if it's a destination", function(){
-		expect(function(){
-			source.addSource(dest);
-		}).toThrow(Error("Curse data flow"));
 	});
 
 	it("should have no source after removing a source to it", function(){
@@ -90,7 +88,7 @@ describe("DataStationBase", function() {
 		var dest2 = new DataStationBase();
 		expect(function(){
 			source.deliver(data, dest2);
-		}).toThrow(Error("Receiver not found"));
+		}).toThrow(Error("Destination not found"));
 	});
 
 	it("should dispatch the data to its destinations if the handler has return value", function(){
@@ -109,12 +107,12 @@ describe("DataStationBase", function() {
 		dest.addHandler(handler.bind(dest),"say");
 		var dest2 = new DataStationBase();
 		dest2.addHandler(function(data){
-			this.dataContainer = data.content + "@";
+			this.hasData = true;
 		}.bind(dest2),"say");
 		dest2.addSource(dest,"say");
 		source.dispatch(data);
 		expect(dest.dataContainer).toBe("hello!");
-		expect(dest2.dataContainer).toBe("hello!@");
+		expect(dest2.hasData).toBe(true);
 	});
 
 	it("should not dispatch anything if there's no return value", function(){
@@ -126,14 +124,14 @@ describe("DataStationBase", function() {
 
 		var dest2 = new DataStationBase();
 		dest2.addHandler(function(data){
-			this.dataContainer = data.content + "@";
+			this.hasData = true;
 		}.bind(dest2),"say");
 		dest2.addSource(dest,"say");
 
 		source.dispatch(data);
 
 		expect(dest.dataContainer).toBe("hello!");
-		expect(dest2.dataContainer).not.toBe("hello!@");
+		expect(dest2.hasData).not.toBe(true);
 	});
 });
 
