@@ -54,7 +54,9 @@ DataStationBase.prototype = assign({},DataStationBase,{
 
 		dataStation._addDestination(this);
 		var emitter = new Emitter();
-		$type = $type || DEFAULT_TYPE;
+		if($type == undefined) {
+			$type = DEFAULT_TYPE;
+		}
 		emitter.on($type,this.process.bind(this));
 		var _types = this.$sources.get(dataStation);
 		_types = _types || new Map();
@@ -66,6 +68,9 @@ DataStationBase.prototype = assign({},DataStationBase,{
 		this.$sources.delete(dataStation);
 	},
 	hasSource : function(dataStation,$type) {
+		if($type == undefined) {
+			$type = DEFAULT_TYPE;
+		}
 		if(!this.$sources.has(dataStation)){
 			return false;
 		}
@@ -91,6 +96,9 @@ DataStationBase.prototype = assign({},DataStationBase,{
 
 	//deliver the data to another dataStation
 	deliver : function(data, dataStation) {
+		if(!data){
+			return;
+		}
 		var receiver = dataStation.getReceiver(this, data.$type);
 		if(!receiver) {
 			throw new Error("Receiver not found");
@@ -120,16 +128,19 @@ DataStationBase.prototype = assign({},DataStationBase,{
 		// 	var ds = new DataStationBase();
 		// 	ds.addHandler(foo.func);			//NOT OK! foo.func won't work as you expect
 		// 	ds.addHandler(foo.func.bind(foo));  //OK
-		$type = $type || DEFAULT_TYPE;
+		if($type == undefined) {
+			$type = DEFAULT_TYPE;
+		}
 		this.$handlers.set($type, handler);
 	},
 	removeHandler : function($type) {
-		$type = $type || DEFAULT_TYPE;
+		if($type == undefined) {
+			$type = DEFAULT_TYPE;
+		}
 		this.$handlers.delete($type);
 	},	
 	//process the data received
 	process : function(data,callback) {
-		data.$type = data.$type || DEFAULT_TYPE;
 		var handler = this.$handlers.get(data.$type);
 		//if the handler of such data type doesn't exist, then 
 		//do nothing
@@ -148,7 +159,9 @@ DataStationBase.prototype = assign({},DataStationBase,{
 		return callback(processedData);
 	},
 	hasHandler : function($type) {
-		$type = $type || DEFAULT_EVENT_TYPE;
+		if($type == undefined) {
+			$type = DEFAULT_TYPE;
+		}
 		return this.$handlers.has($type);
 	},
 	//dispatch the data to all destinations
@@ -157,6 +170,9 @@ DataStationBase.prototype = assign({},DataStationBase,{
 		//do nothing.
 		if(!data) {
 			return;
+		}
+		if(data.$type == undefined) {
+			data.$type = DEFAULT_TYPE;
 		}
 		this.$destinations.forEach(this.deliver.bind(this,data));		
 	}

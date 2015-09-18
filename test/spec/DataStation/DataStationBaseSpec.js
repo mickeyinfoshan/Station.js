@@ -133,5 +133,17 @@ describe("DataStationBase", function() {
 		expect(dest.dataContainer).toBe("hello!");
 		expect(dest2.hasData).not.toBe(true);
 	});
+
+	it("can have different types for the same source" ,function(){
+		dest.addSource(source);
+		dest.addHandler(function(){
+			this.gotData = true;
+		}.bind(dest));
+		dest.addHandler(handler.bind(dest),"say");
+		source.dispatch({data:"ccc"});
+		source.dispatch(data);
+		expect(dest.dataContainer).toBe("hello!");
+		expect(dest.gotData).toBe(true);
+	});
 });
 
