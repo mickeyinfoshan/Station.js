@@ -86,9 +86,11 @@ describe("DataStationBase", function() {
 
 	it("should not deliver the data to another data station which is not a destionation",function(){
 		var dest2 = new DataStationBase();
-		expect(function(){
-			source.deliver(data, dest2);
-		}).toThrow(Error("Destination not found"));
+		dest2.addHandler(function(data){
+			this.hasData = true;
+		}.bind(dest2),"say");
+		source.deliver(data, dest2);
+		expect(dest2.hasData).not.toBe(true);
 	});
 
 	it("should dispatch the data to its destinations if the handler has return value", function(){
@@ -136,6 +138,7 @@ describe("DataStationBase", function() {
 
 	it("can have different types for the same source" ,function(){
 		dest.addSource(source);
+		expect(dest.hasSource(source)).toBe(true);
 		dest.addHandler(function(){
 			this.gotData = true;
 		}.bind(dest));
@@ -145,5 +148,6 @@ describe("DataStationBase", function() {
 		expect(dest.dataContainer).toBe("hello!");
 		expect(dest.gotData).toBe(true);
 	});
+	
 });
 

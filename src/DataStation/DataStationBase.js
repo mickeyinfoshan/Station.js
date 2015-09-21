@@ -32,15 +32,13 @@
 
 'use strict';
 
-
 var Stream = require("stream");
 var assign = require("object-assign");
 var Emitter = require("events").EventEmitter;
 var Set = require("es6-set");
 var Map = require("es6-map");
 var DEFAULT_TYPE = require("../Constants/constants.js").DEFAULT_TYPE;
-//TODO: change sources, handlers to Map
-//and change destinations to Set
+
 var DataStationBase = function() {
 	this.$sources = new Map();
 	this.$destinations = new Set();
@@ -101,7 +99,7 @@ DataStationBase.prototype = assign({},DataStationBase,{
 		}
 		var receiver = dataStation.getReceiver(this, data.$type);
 		if(!receiver) {
-			throw new Error("Receiver not found");
+			return;
 		}
 		receiver.emit(data.$type, data);
 	},
@@ -109,7 +107,7 @@ DataStationBase.prototype = assign({},DataStationBase,{
 	getReceiver : function(dataStation, $type) {
 		var types = this.$sources.get(dataStation);
 		if(!types) {
-			throw new Error("Destination not found");
+			return;
 		}
 		return types.get($type);
 	},
