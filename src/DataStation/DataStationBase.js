@@ -39,7 +39,7 @@ var Set = require("es6-set");
 var Map = require("es6-map");
 var DEFAULT_TYPE = require("../Constants/constants.js").DEFAULT_TYPE;
 
-var DataStationBase = function() {
+function DataStationBase() {
 	this.$sources = new Map();
 	this.$destinations = new Set();
 	this.$handlers = new Map();

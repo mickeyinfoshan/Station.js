@@ -8,24 +8,22 @@ var sourcemaps = require('gulp-sourcemaps');
 var source = require('vinyl-source-stream');
 var buffer = require('vinyl-buffer');
 var gutil = require('gulp-util');
+var gbrowserify = require("gulp-browserify");
 
 
 gulp.task('javascript', function () {
   // set up the browserify instance on a task basis
-  var b = browserify({
-    entries: './src/entry.js',
-    debug: true
-  });
+  b.add('./src/DataStation/DataStationBase.js');
 
   return b.bundle()
-    .pipe(source('app.js'))
-    .pipe(buffer())
-    .pipe(sourcemaps.init({loadMaps: true}))
-        // Add transformation tasks to the pipeline here.
-        .pipe(uglify())
-        .on('error', gutil.log)
-    .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest('./dist/js/'));
+});
+
+gulp.task('scripts', function() {
+    // Single entry point to browserify 
+    gulp.src('./examples/**.js')
+        .pipe(gbrowserify())
+        .pipe(gulp.dest('./examples/js'));
 });
 
 gulp.task('jasmine-test', function () {
