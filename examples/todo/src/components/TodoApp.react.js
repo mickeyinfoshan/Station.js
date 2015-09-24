@@ -19,11 +19,11 @@ var TodoApp = React.createClass({
 		var _this = this;
 		var station = new DataStationBase();
 		station.addSource(TodoStore,"Todo.list");
-		station.addHandler(function(todosData){
+		station.addHandler("Todo.list", function(todosData){
 			this.setState({
 				todos : todosData.todos 
 			});
-		}.bind(_this),"Todo.list");
+		}.bind(_this));
 		this.station = station;
 	},
 	render: function() {

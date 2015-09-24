@@ -1,8 +1,8 @@
-let assign = require('object-assign');
-let Promise = require('es6-promise');
-let Set = require('es6-set');
+var assign = require('object-assign');
+var Promise = require('es6-promise');
+var Set = require('es6-set');
 
-let DispatcherBase = function() {
+var DispatcherBase = function() {
 	this.registered = [] ;
 	this.prioritySet = new Set();
 };
@@ -36,5 +36,4 @@ DispatcherBase.prototype = assign({},DispatcherBase.prototype,{
 		});
 	}
 });
-
-export default DispatcherBase;
+module.exports = DispatcherBase;

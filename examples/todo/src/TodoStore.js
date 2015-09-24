@@ -18,31 +18,31 @@ TodoStore.dispatchAllTodos = function() {
 	});
 };
 
-TodoStore.addHandler(function() {
+TodoStore.addHandler("Todo.list", function() {
 	this.dispatchAllTodos();
-}.bind(TodoStore), "Todo.list");
+}.bind(TodoStore));
 
-TodoStore.addHandler(function(todoData) {
+TodoStore.addHandler("Todo.create", function(todoData) {
 	var todo = {
 		content : todoData.content,
 		complete: false
 	};
 	this.todos.push(todo);
 	this.dispatchAllTodos();
-}.bind(TodoStore),"Todo.create");
+}.bind(TodoStore));
 
-TodoStore.addHandler(function(todoData) {
+TodoStore.addHandler("Todo.destroy", function(todoData) {
 	var todo = todoData.todo;
 	var index = this.todos.indexOf(todo);
 	this.todos.splice(index, 1);
 	this.dispatchAllTodos();
-}.bind(TodoStore),"Todo.destroy");
+}.bind(TodoStore));
 
-TodoStore.addHandler(function(todoData){
+TodoStore.addHandler("Todo.complete", function(todoData){
 	var todo = todoData.todo;
 	var index = this.todos.indexOf(todo);
 	this.todos[index].complete = true;
 	this.dispatchAllTodos();
-}.bind(TodoStore), "Todo.complete");
+}.bind(TodoStore));
 
 module.exports = TodoStore;

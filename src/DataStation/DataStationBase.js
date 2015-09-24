@@ -111,7 +111,7 @@ DataStationBase.prototype = assign({},DataStationBase,{
 		}
 		return types.get($type);
 	},
-	addHandler : function(handler,$type) {
+	addHandler : function($type,handler) {
 		//adding the handler of data type existed
 		//will override the origin one
 		//`this` needs to be binded when the handler use `this` ,
@@ -126,6 +126,10 @@ DataStationBase.prototype = assign({},DataStationBase,{
 		// 	var ds = new DataStationBase();
 		// 	ds.addHandler(foo.func);			//NOT OK! foo.func won't work as you expect
 		// 	ds.addHandler(foo.func.bind(foo));  //OK
+		if(typeof $type === "function") {
+			handler = $type;
+			$type = undefined;
+		}
 		if($type == undefined) {
 			$type = DEFAULT_TYPE;
 		}
