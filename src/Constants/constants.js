@@ -1,5 +1,6 @@
 var _CONSTANTS = {
-	DEFAULT_TYPE : "_DATA"
+	DEFAULT_TYPE : "_DATA",
+	DEFAULT_EVENT : "_STATION_DATA_GOT"
 };
 
 module.exports = _CONSTANTS;

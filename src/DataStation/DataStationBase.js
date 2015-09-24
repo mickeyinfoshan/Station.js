@@ -32,12 +32,14 @@
 
 'use strict';
 
-var Stream = require("stream");
 var assign = require("object-assign");
 var Emitter = require("events").EventEmitter;
 var Set = require("es6-set");
 var Map = require("es6-map");
-var DEFAULT_TYPE = require("../Constants/constants.js").DEFAULT_TYPE;
+var CONSTANTS = require("../Constants/constants.js");
+
+var DEFAULT_TYPE = CONSTANTS.DEFAULT_TYPE;
+var DEFAULT_EVENT = CONSTANTS.DEFAULT_EVENT;
 
 function DataStationBase() {
 	this.$sources = new Map();
@@ -48,31 +50,19 @@ function DataStationBase() {
 DataStationBase.prototype = assign({},DataStationBase,{
 
 	//adding a data source will create an EventEmitter waiting for data 
-	addSource : function(dataStation, $type) {
+	addSource : function(dataStation) {
 
 		dataStation._addDestination(this);
 		var emitter = new Emitter();
-		if($type == undefined) {
-			$type = DEFAULT_TYPE;
-		}
-		emitter.on($type,this.process.bind(this));
-		var _types = this.$sources.get(dataStation);
-		_types = _types || new Map();
-		_types.set($type, emitter);
-		this.$sources.set(dataStation, _types);
+		emitter.on(DEFAULT_EVENT, this.process.bind(this));
+		this.$sources.set(dataStation, emitter);
 	},
 	removeSource : function(dataStation) {
 		dataStation._removeDestination(this);
 		this.$sources.delete(dataStation);
 	},
-	hasSource : function(dataStation,$type) {
-		if($type == undefined) {
-			$type = DEFAULT_TYPE;
-		}
-		if(!this.$sources.has(dataStation)){
-			return false;
-		}
-		return this.$sources.get(dataStation).has($type);
+	hasSource : function(dataStation) {
+		return this.$sources.has(dataStation);
 	},
 	getSourcesCount : function() {
 		return this.$sources.size;
@@ -97,19 +87,16 @@ DataStationBase.prototype = assign({},DataStationBase,{
 		if(!data){
 			return;
 		}
-		var receiver = dataStation.getReceiver(this, data.$type);
+		var receiver = dataStation._getReceiver(this);
 		if(!receiver) {
 			return;
 		}
-		receiver.emit(data.$type, data);
+		receiver.emit(DEFAULT_EVENT, data);
 	},
 
-	getReceiver : function(dataStation, $type) {
-		var types = this.$sources.get(dataStation);
-		if(!types) {
-			return;
-		}
-		return types.get($type);
+	_getReceiver : function(dataStation) {
+		var receiver = this.$sources.get(dataStation);	
+		return receiver;
 	},
 	addHandler : function($type,handler) {
 		//adding the handler of data type existed

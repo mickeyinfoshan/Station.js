@@ -18,7 +18,7 @@ var TodoApp = React.createClass({
 	initStation : function() {
 		var _this = this;
 		var station = new DataStationBase();
-		station.addSource(TodoStore,"Todo.list");
+		station.addSource(TodoStore);
 		station.addHandler("Todo.list", function(todosData){
 			this.setState({
 				todos : todosData.todos 

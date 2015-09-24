@@ -4,10 +4,7 @@ var DataStationBase = require("../../../src/DataStation/DataStationBase");
 
 var TodoStore = new DataStationBase();
 
-TodoStore.addSource(TodoAction, "Todo.list");
-TodoStore.addSource(TodoAction, "Todo.create");
-TodoStore.addSource(TodoAction, "Todo.destroy");
-TodoStore.addSource(TodoAction, "Todo.complete");
+TodoStore.addSource(TodoAction);
 
 TodoStore.todos = [];
 

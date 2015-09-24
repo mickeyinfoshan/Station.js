@@ -23,7 +23,7 @@ describe("DataStationBase", function() {
 	beforeEach(function(){
 		source = new DataStationBase();
 		dest = new DataStationBase();
-		dest.addSource(source,"say");
+		dest.addSource(source);
 	});
 
 	it("should not have a source before adding one to it", function(){
@@ -32,7 +32,7 @@ describe("DataStationBase", function() {
 
 	it("should have a source after adding a source to it",function(){
 		expect(source.hasDestination(dest)).toBe(true);
-		expect(dest.hasSource(source, data.$type)).toBe(true);
+		expect(dest.hasSource(source)).toBe(true);
 		expect(source.getDestinationsCount()).toBe(1);
 		expect(dest.getSourcesCount()).toBe(1);
 	});
@@ -99,7 +99,7 @@ describe("DataStationBase", function() {
 		dest2.addHandler("say", function(data){
 			this.dataContainer = data.content + "@";
 		}.bind(dest2));
-		dest2.addSource(source,"say");
+		dest2.addSource(source);
 		source.dispatch(data);
 		expect(dest.dataContainer).toBe("hello!");
 		expect(dest2.dataContainer).toBe("hello@");
@@ -111,7 +111,7 @@ describe("DataStationBase", function() {
 		dest2.addHandler("say", function(data){
 			this.hasData = true;
 		}.bind(dest2));
-		dest2.addSource(dest,"say");
+		dest2.addSource(dest);
 		source.dispatch(data);
 		expect(dest.dataContainer).toBe("hello!");
 		expect(dest2.hasData).toBe(true);
@@ -128,7 +128,7 @@ describe("DataStationBase", function() {
 		dest2.addHandler("say",function(data){
 			this.hasData = true;
 		}.bind(dest2));
-		dest2.addSource(dest,"say");
+		dest2.addSource(dest);
 
 		source.dispatch(data);
 
