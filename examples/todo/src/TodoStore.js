@@ -1,17 +1,30 @@
-var DataStationBase = require("../../src/DataStation/DataStationBase.js");
+var TodoAction = require("./TodoAction.js");
+
+var DataStationBase = require("../../../src/DataStation/DataStationBase");
+
 var TodoStore = new DataStationBase();
+
+TodoStore.addSource(TodoAction, "Todo.list");
+TodoStore.addSource(TodoAction, "Todo.create");
+TodoStore.addSource(TodoAction, "Todo.destroy");
+TodoStore.addSource(TodoAction, "Todo.complete");
+
 TodoStore.todos = [];
 
 TodoStore.dispatchAllTodos = function() {
 	this.dispatch({
-		todos : this.todos,
-		$type : 'Todo.list'
+		$type : "Todo.list",
+		todos : this.todos
 	});
 };
 
+TodoStore.addHandler(function() {
+	this.dispatchAllTodos();
+}.bind(TodoStore), "Todo.list");
+
 TodoStore.addHandler(function(todoData) {
 	var todo = {
-		text : todoData.content,
+		content : todoData.content,
 		complete: false
 	};
 	this.todos.push(todo);
@@ -24,5 +37,12 @@ TodoStore.addHandler(function(todoData) {
 	this.todos.splice(index, 1);
 	this.dispatchAllTodos();
 }.bind(TodoStore),"Todo.destroy");
+
+TodoStore.addHandler(function(todoData){
+	var todo = todoData.todo;
+	var index = this.todos.indexOf(todo);
+	this.todos[index].complete = true;
+	this.dispatchAllTodos();
+}.bind(TodoStore), "Todo.complete");
 
 module.exports = TodoStore;

@@ -1,6 +1,9 @@
-var TodoStore = require("./TodoStore.js");
-
+var TodoStore = require("../TodoStore");
+var TodoAction = require("../TodoAction");
 var React = require('react');
+var DataStationBase = require("../../../../src/DataStation/DataStationBase");
+var TodoItem = require("./TodoItem.react")
+var TodoInput = require("./TodoInput.react")
 
 var TodoApp = React.createClass({
 	getInitialState: function() {
@@ -10,27 +13,30 @@ var TodoApp = React.createClass({
 	},
 	componentDidMount: function() {
 		this.initStation();	
-		TodoStore.dispatchAllTodos();
-		
-	},
-	createTodo : function() {
-
+		TodoAction.list();
 	},
 	initStation : function() {
+		var _this = this;
 		var station = new DataStationBase();
 		station.addSource(TodoStore,"Todo.list");
 		station.addHandler(function(todosData){
 			this.setState({
 				todos : todosData.todos 
 			});
-		}.bind(this),"Todo.list");
-		TodoStore.addSource(station,"Todo.create");
-		TodoStore.addSource(station,"Todo.destroy");
+		}.bind(_this),"Todo.list");
 		this.station = station;
 	},
 	render: function() {
+		var todoItems = this.state.todos.map(function(todo){
+			return <TodoItem todo={todo} />
+		});
 		return ( 
-			<div></div>
+			<div>
+				<ul>
+					{todoItems}
+				</ul>
+				<TodoInput />
+			</div>
 		);
 	}
 
