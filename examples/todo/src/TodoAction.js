@@ -22,9 +22,9 @@ TodoAction.destroy = function(todo) {
 	});
 };
 
-TodoAction.complete = function(todo) {
+TodoAction.toggleComplete = function(todo) {
 	this.dispatch({
-		$type : "Todo.complete",
+		$type : "Todo.toggleComplete",
 		todo : todo
 	});
 };

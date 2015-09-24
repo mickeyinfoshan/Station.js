@@ -35,10 +35,10 @@ TodoStore.addHandler("Todo.destroy", function(todoData) {
 	this.dispatchAllTodos();
 }.bind(TodoStore));
 
-TodoStore.addHandler("Todo.complete", function(todoData){
+TodoStore.addHandler("Todo.toggleComplete", function(todoData){
 	var todo = todoData.todo;
 	var index = this.todos.indexOf(todo);
-	this.todos[index].complete = true;
+	this.todos[index].complete = !this.todos[index].complete;
 	this.dispatchAllTodos();
 }.bind(TodoStore));
 

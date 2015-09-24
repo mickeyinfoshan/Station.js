@@ -2,17 +2,18 @@ var TodoAction = require("../TodoAction");
 var React = require('react');
 
 var TodoItem = React.createClass({
-	complete : function() {
-		TodoAction.complete(this.props.todo);
+	toggleComplete : function() {
+		TodoAction.toggleComplete(this.props.todo);
 	},
 	destroy : function() {
 		TodoAction.destroy(this.props.todo);
 	},
 	render : function() {
-		var completeBtn = <button onClick={this.complete}>Complete</button>
-		if(this.props.todo.complete){
-			completeBtn = "Completed";
+		var completeText = "complete it";
+		if(this.props.todo.complete) {
+			completeText = "completed";
 		}
+		var completeBtn = <button onClick={this.toggleComplete}>{completeText}</button>
 		return (
 			<li>
 				{completeBtn}&nbsp;&nbsp;
