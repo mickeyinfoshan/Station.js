@@ -2,10 +2,10 @@
 
 ---
 
-**Station.js** is a  for more complex architectures. Let's consider the architecture of an application as a directed graph, which including nodes and links. Everything in an application that process/store data is a node of the graph and the connections between them are links.
+**Station.js** is a basic module for more complex architectures. Let's consider the architecture of an application as a directed graph, which including nodes and links. Everything in an application that process/store data is a node of the graph and the connections between them are links.
 In **Station.js**, we consider a node as a data station and a link as communication between nodes.
 
-#DataStation
+##DataStation
 
 ---
 
@@ -27,6 +27,23 @@ A single data station won't do anything for you!
 
 ---
 
-***API***
+###API
 
-	**addSource(DataStation source): void** Add a source to listen to. When the source
+**addSource(DataStation source, String type): void**
+ Add a data station as a source. When the source dispatch data, this data station will get the data. 
+
+**removeSource(DataStation source)** No longer receive data from that station
+
+**hasSource(DataStation source, String type): boolean**
+
+**getSourceCount(): int**
+
+**addHandler(String type, Function handler): void**
+Add a data handler for a certain data type. 
+
+**removeHandler(String type): void**
+Remove a data handler for a certian type
+
+**hasHandler(String type): boolean**
+
+**dispatch(Object data): void**
