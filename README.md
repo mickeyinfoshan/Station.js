@@ -1,13 +1,11 @@
 #Station.js
 
----
-
 **Station.js** is a basic module for more complex architectures. Let's consider the architecture of an application as a directed graph, which including nodes and links. Everything in an application that process/store data is a node of the graph and the connections between them are links.
 In **Station.js**, we consider a node as a data station and a link as communication between nodes.
 
-##DataStation
-
 ---
+
+##DataStation
 
 DataStation is a core concept in Station.js. 
 
@@ -24,8 +22,6 @@ A data station can have one or more data destinations. When a data station add a
 A data station can have several handlers dealing with a certain data type respectively. When data comes, a data station will choose the corresponding handler to process the data. If there's no corresponding handler found, do nothing. If a handler returns a value, then the data station will dispatch the return value to all data destinations of it. Otherwise, nothing more to do. If the return value doesn't have '$type' attribute, the origin data type will add to it.
 
 A single data station won't do anything for you!
-
----
 
 ###API
 
@@ -50,7 +46,7 @@ Remove a data handler for a certian data type.
 
 ###Example:
 	
-	`var d1, d2, d3;
+	var d1, d2, d3;
 	d1 = new DataStationBase();
 	d2 = new DataStationBase();
 	d2 = new DataStationBase();
@@ -86,9 +82,9 @@ Remove a data handler for a certian data type.
 		D2 got the data. The type of data is 'data'.
 		D3 got the data. The type of data is 'data'.
 	*/
-	`
+	
 
 
 
-	To know more about the features, just read the test!
+To know more about the features, just read the test!
 
