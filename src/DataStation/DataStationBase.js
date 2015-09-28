@@ -61,13 +61,26 @@ DataStationBase.prototype = assign({},DataStationBase,{
 		_types.set($type, emitter);
 		this.$sources.set(dataStation, _types);
 	},
-	removeSource : function(dataStation) {
-		dataStation._removeDestination(this);
-		this.$sources.delete(dataStation);
+	removeSource : function(dataStation, $type) {
+		function removeSourceDataStation() {
+			dataStation._removeDestination(this);
+			this.$sources.delete(dataStation);
+		}
+
+		var types = this.$sources.get(dataStation);
+		if(types && $type) {
+			types.delete($type);
+			if(types.size <= 0) {
+				(removeSourceDataStation.bind(this))();
+			}
+		}
+		else {
+			(removeSourceDataStation.bind(this))();
+		}
 	},
 	hasSource : function(dataStation,$type) {
 		if($type == undefined) {
-			$type = DEFAULT_TYPE;
+			return this.$sources.has(dataStation);
 		}
 		if(!this.$sources.has(dataStation)){
 			return false;

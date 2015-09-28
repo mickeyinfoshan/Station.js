@@ -38,11 +38,18 @@ describe("DataStationBase", function() {
 	});
 
 	it("should have no source after removing a source to it", function(){
+		dest.addSource(source, "shout");
+		dest.removeSource(source,"say");
+		expect(source.hasDestination(dest)).toBe(true);
+		expect(dest.hasSource(source, "say")).toBe(false);
+		expect(dest.hasSource(source)).toBe(true);
+		expect(source.getDestinationsCount()).toBe(1);
+		expect(dest.getSourcesCount()).toBe(1);
 		dest.removeSource(source);
 		expect(source.hasDestination(dest)).toBe(false);
-		expect(dest.hasSource(source)).toBe(false);
 		expect(source.getDestinationsCount()).toBe(0);
 		expect(dest.getSourcesCount()).toBe(0);
+		expect(dest.hasSource(source)).toBe(false);
 	});
 
 	it("should have a corresponding handler after adding one to it", function(){

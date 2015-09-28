@@ -26,6 +26,9 @@ var TodoApp = React.createClass({
 		}.bind(_this));
 		this.station = station;
 	},
+	componentWillUnmount: function() {
+		this.station.removeSource(TodoStore);
+	},
 	render: function() {
 		var todoItems = this.state.todos.map(function(todo){
 			return <TodoItem todo={todo} />
