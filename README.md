@@ -72,7 +72,7 @@ Remove a data handler for a certian data type.
 	d2.addHandler("data", gotData.bind(d2));
 	d3.addHandler("data", gotData.bind(d3));
 
-	//the data delivered in the chain
+	//the data delivered through the chain
 	var data = {
 		$type : "data"
 	};
@@ -85,9 +85,10 @@ Remove a data handler for a certian data type.
 		output : 
 		D2 got the data. The type of data is 'data'.
 		D3 got the data. The type of data is 'data'.
-	*/`
+	*/
+	`
 
 
 
-	To know more about the behaviour, just read the test!
+	To know more about the features, just read the test!
 
