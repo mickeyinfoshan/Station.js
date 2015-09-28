@@ -29,21 +29,65 @@ A single data station won't do anything for you!
 
 ###API
 
-**addSource(DataStation source, String type): void**
- Add a data station as a source. When the source dispatch data, this data station will get the data. 
+**addSource(DataStation source[, String $type]): void**
+ Add a data station as a source. When the source dispatch data of such type, this data station will get the data. If no type provided, a default type will be used.
 
-**removeSource(DataStation source)** No longer receive data from that station
+**removeSource(DataStation source[, String $type])** No longer receive data of the type from that station. If no type provided, remove all data types, which means this data station will not receive any from the source anymore.
 
-**hasSource(DataStation source, String type): boolean**
+**hasSource(DataStation source[, String $type]): boolean** Determine wheter receiving data of the type from the source. If no type provided, determine wheter receiving any data from the source.
 
-**getSourceCount(): int**
+**getSourceCount(): int** Return the number of sources.
 
 **addHandler(String type, Function handler): void**
-Add a data handler for a certain data type. 
+Add a data handler for a certain data type. The handler can have a return value. If so, this data station will dispatch the return value to all its destination automatically. There are two things need to be mentioned here. First, if the handler is a method of an object which uses `this`, you need to `bind` the correct `this` to the handler or the handler will not work as your expectation. Second, your return value should be an object or it will throw a type error. You can set the data type of your return value by setting the `$type` attribute. If you don't, the data type this handler deal with will be used.
 
-**removeHandler(String type): void**
-Remove a data handler for a certian type
+**removeHandler(String $type): void**
+Remove a data handler for a certian data type.
 
-**hasHandler(String type): boolean**
+**hasHandler(String $type): boolean** Determine wheter the data station process suce type of data.
 
-**dispatch(Object data): void**
+**dispatch(Object data): void** Dispatch the data to all its destinations, which may invoke the handler of the destinations. This method would be invoked automatically after this data station receives data, process it and has a return value.
+
+###Example:
+	
+	`var d1, d2, d3;
+	d1 = new DataStationBase();
+	d2 = new DataStationBase();
+	d2 = new DataStationBase();
+
+	d2.name = "D2";
+	d3.name = "D3";
+
+	//make a chain of delivering.
+	d2.addSource(d1, "data");
+	d3.addSource(d2, "data");
+
+	//the handler
+	function gotData(data) {
+		this.hasData = true; //`this` will be set by using `bind`
+		console.log(this.name + " got the data. The type of data is '" + data.$type + "'.");
+		return data;		 //just return the value
+	}
+
+	d2.addHandler("data", gotData.bind(d2));
+	d3.addHandler("data", gotData.bind(d3));
+
+	//the data delivered in the chain
+	var data = {
+		$type : "data"
+	};
+
+	d1.dispatch(data);
+	/*
+		d2.hasData == true
+		d3.hasData == true
+
+		output : 
+		D2 got the data. The type of data is 'data'.
+		D3 got the data. The type of data is 'data'.
+	*/`
+
+
+
+	To know more about the behaviour, just read the test!
+
