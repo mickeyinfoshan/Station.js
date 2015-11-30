@@ -32,23 +32,20 @@
 
 'use strict';
 
-var Stream = require("stream");
 var assign = require("object-assign");
 var Emitter = require("events").EventEmitter;
-var Set = require("es6-set");
-var Map = require("es6-map");
+var Set = Set || require("es6-set");
+var Map = Map || require("es6-map");
 var DEFAULT_TYPE = require("../Constants/constants.js").DEFAULT_TYPE;
 
-function DataStationBase() {
-	this.$sources = new Map();
-	this.$destinations = new Set();
-	this.$handlers = new Map();
-};
+class DataStationBase {
+	constructor() {
+		this.$sources = new Map();
+		this.$destinations = new Set();
+		this.$handlers = new Map();
+	}
 
-DataStationBase.prototype = assign({},DataStationBase,{
-
-	//adding a data source will create an EventEmitter waiting for data 
-	addSource : function(dataStation, $type) {
+	addSource (dataStation, $type) {
 
 		dataStation._addDestination(this);
 		var emitter = new Emitter();
@@ -60,8 +57,9 @@ DataStationBase.prototype = assign({},DataStationBase,{
 		_types = _types || new Map();
 		_types.set($type, emitter);
 		this.$sources.set(dataStation, _types);
-	},
-	removeSource : function(dataStation, $type) {
+	}
+
+	removeSource (dataStation, $type) {
 		function removeSourceDataStation() {
 			dataStation._removeDestination(this);
 			this.$sources.delete(dataStation);
@@ -77,8 +75,9 @@ DataStationBase.prototype = assign({},DataStationBase,{
 		else {
 			(removeSourceDataStation.bind(this))();
 		}
-	},
-	hasSource : function(dataStation,$type) {
+	}
+
+	hasSource (dataStation,$type) {
 		if($type == undefined) {
 			return this.$sources.has(dataStation);
 		}
@@ -86,27 +85,28 @@ DataStationBase.prototype = assign({},DataStationBase,{
 			return false;
 		}
 		return this.$sources.get(dataStation).has($type);
-	},
-	getSourcesCount : function() {
+	}
+
+	getSourcesCount() {
 		return this.$sources.size;
-	},
+	}
 	//shouldn't invoke by users, this is
 	// a private method
-	_addDestination : function(dataStation) {
+	_addDestination(dataStation) {
 		this.$destinations.add(dataStation);
-	},
-	_removeDestination : function(dataStation) {
+	}
+	_removeDestination(dataStation) {
 		this.$destinations.delete(dataStation);
-	},
-	hasDestination : function(dataStation) {
+	}
+	hasDestination(dataStation) {
 		return this.$destinations.has(dataStation);
-	},
-	getDestinationsCount : function() {
+	}
+	getDestinationsCount() {
 		return this.$destinations.size;
-	},
+	}
 
 	//deliver the data to another dataStation
-	deliver : function(data, dataStation) {
+	deliver(data, dataStation) {
 		if(!data){
 			return;
 		}
@@ -115,22 +115,23 @@ DataStationBase.prototype = assign({},DataStationBase,{
 			return;
 		}
 		receiver.emit(data.$type, data);
-	},
+	}
 
-	getReceiver : function(dataStation, $type) {
+	getReceiver(dataStation, $type) {
 		var types = this.$sources.get(dataStation);
 		if(!types) {
 			return;
 		}
 		return types.get($type);
-	},
-	addHandler : function($type,handler) {
+	}
+
+	addHandler($type,handler) {
 		//adding the handler of data type existed
 		//will override the origin one
 		//`this` needs to be binded when the handler use `this` ,
 		//For example:
 		//  var foo = {
-		// 		func : function(){		        // a method use `this`
+		// 		func(){		        // a method use `this`
 		//	    	...
 		//			...this...
 		//			...
@@ -147,15 +148,17 @@ DataStationBase.prototype = assign({},DataStationBase,{
 			$type = DEFAULT_TYPE;
 		}
 		this.$handlers.set($type, handler);
-	},
-	removeHandler : function($type) {
+	}
+
+	removeHandler($type) {
 		if($type == undefined) {
 			$type = DEFAULT_TYPE;
 		}
 		this.$handlers.delete($type);
-	},	
+	}
+
 	//process the data received
-	process : function(data,callback) {
+	process(data,callback) {
 		var handler = this.$handlers.get(data.$type);
 		//if the handler of such data type doesn't exist, then 
 		//do nothing
@@ -172,15 +175,16 @@ DataStationBase.prototype = assign({},DataStationBase,{
 		callback = callback || this.dispatch;
 		callback = callback.bind(this);
 		return callback(processedData);
-	},
-	hasHandler : function($type) {
+	}
+	hasHandler($type) {
 		if($type == undefined) {
 			$type = DEFAULT_TYPE;
 		}
 		return this.$handlers.has($type);
-	},
+	}
+
 	//dispatch the data to all destinations
-	dispatch : function(data) {
+	dispatch(data) {
 		//If the handler didn't produce any data, 
 		//do nothing.
 		if(!data) {
@@ -191,6 +195,6 @@ DataStationBase.prototype = assign({},DataStationBase,{
 		}
 		this.$destinations.forEach(this.deliver.bind(this,data));		
 	}
-});
+}
 
 module.exports = DataStationBase;

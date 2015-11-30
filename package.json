@@ -1,25 +1,24 @@
 {
-  "name": "flux",
-  "description": "Flux architecture for complex WEB applications. ",
+  "name": "dataStation",
+  "description": "components for flux architecture ",
   "version": "0.0.1",
   "keywords": [
-    "flux",
+    "dataStation",
     "dispatcher",
     "undirectional"
   ],
-  "devDependencies": {
-    "es6-map": "^0.1.1",
-    "es6-promise": "^3.0.2",
-    "es6-set": "^0.1.1",
-    "events": "^1.0.2",
-    "gulp-concat": "^2.6.0",
-    "gulp-jasmine": "^2.1.0",
-    "jasmine-core": "^2.3.4",
-    "karma": "^0.13.9",
-    "karma-chrome-launcher": "^0.2.0",
+  "dependencies": {
+    "babel-core": "^6.2.1",
+    "babel-loader": "^6.2.0",
+    "es6-map": "^0.1.3",
+    "es6-set": "^0.1.3",
+    "events": "^1.1.0",
+    "jasmine": "^2.3.2",
+    "karma": "^0.13.15",
+    "karma-chrome-launcher": "^0.2.1",
     "karma-jasmine": "^0.3.6",
-    "object-assign": "^4.0.1",
-    "reactify": "^1.1.1",
-    "watchify": "^3.4.0"
+    "karma-webpack": "^1.7.0",
+    "webpack": "^1.12.9",
+    "webpack-dev-server": "^1.14.0"
   }
 }
