@@ -4,29 +4,29 @@
 
 	****************************************
 
-	DataStation is a core concept in PipeFlux. 
+	DataStation is a core concept in PipeFlux.
 	An undirectional application is like a tree
 	and a data station is like a node of the tree.
 	A data station take the responsibility to receive
 	data, process data, and then dispatch the processed
 	data to the next.
-	Everything can be a data station. Models, views and 
+	Everything can be a data station. Models, views and
 	controllers in MVC can be data stations. Dispatchers
 	and stores in Flux can be data stations.
-	A data station can have several data sources. Sources can be 
-	added through 'addSource' method, 
-	which will create a receiver waiting for data. 
+	A data station can have several data sources. Sources can be
+	added through 'addSource' method,
+	which will create a receiver waiting for data.
 	A data station can have one or more data destinations. When a data station
 	add an another data station as a data source, this data station will be a data
 	destination of the other one.
 	A data station can have several handlers dealing
-	with a certain data type. When data comes, a data station will choose the 
+	with a certain data type. When data comes, a data station will choose the
 	corresponding handler to process the data.
 	If no corresponding handler found, do nothing.
 	If a handler returns value, then the data station will
-	dispatch the return value to all data destinations of it. 
+	dispatch the return value to all data destinations of it.
 	Otherwise, nothing more to do.
-	If the return value doesn't have '$type' attribute, 
+	If the return value doesn't have '$type' attribute,
 	the origin $type will add to it.
 */
 
@@ -39,11 +39,13 @@ var Map = Map || require("es6-map");
 var DEFAULT_TYPE = require("../Constants/constants.js").DEFAULT_TYPE;
 
 class DataStationBase {
+
 	constructor() {
 		this.$sources = new Map();
 		this.$destinations = new Set();
 		this.$handlers = new Map();
 	}
+
 
 	addSource (dataStation, $type) {
 
@@ -160,14 +162,14 @@ class DataStationBase {
 	//process the data received
 	process(data,callback) {
 		var handler = this.$handlers.get(data.$type);
-		//if the handler of such data type doesn't exist, then 
+		//if the handler of such data type doesn't exist, then
 		//do nothing
 		if(!handler) {
 			return;
 		}
 
 		//handle the data
-		var processedData = handler(data);
+		var processedData = handler(data.$content);
 		if(processedData && processedData.$type == undefined){
 			processedData.$type = data.$type;
 		}
@@ -185,7 +187,7 @@ class DataStationBase {
 
 	//dispatch the data to all destinations
 	dispatch(data) {
-		//If the handler didn't produce any data, 
+		//If the handler didn't produce any data,
 		//do nothing.
 		if(!data) {
 			return;
@@ -193,7 +195,7 @@ class DataStationBase {
 		if(data.$type == undefined) {
 			data.$type = DEFAULT_TYPE;
 		}
-		this.$destinations.forEach(this.deliver.bind(this,data));		
+		this.$destinations.forEach(this.deliver.bind(this,data));
 	}
 }
 

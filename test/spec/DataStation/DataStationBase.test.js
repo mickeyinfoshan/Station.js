@@ -1,5 +1,5 @@
 /*
-	tests for DataStationBase 
+	tests for DataStationBase
 */
 
 describe("DataStationBase", function() {
@@ -9,12 +9,10 @@ describe("DataStationBase", function() {
 	var dest;
 	var data = {
 		$type : "say",
-		content : "hello"
+		$content : "hello"
 	};
 
-	var handler = function(data) {
-		var content = data.content;
-		//console.log("say: " + content);
+	var handler = function(content) {
 		content += "!";
 		this.dataContainer = content;
 		return {content : content};
@@ -73,13 +71,13 @@ describe("DataStationBase", function() {
 	it("should do nothing if the corresponding handler not found", function(){
 		dest.addHandler(handler.bind(dest));
 		var result = dest.process(data);
-		expect(dest.dataContainer).not.toBe("hello!");	
+		expect(dest.dataContainer).not.toBe("hello!");
 	});
 
 	it("should override the handler of the same _type", function(){
 		dest.addHandler("say", handler.bind(dest));
 		dest.addHandler("say", function(data){
-			this.dataContainer = data.content + "@";
+			this.dataContainer = data + "@";
 		}.bind(dest));
 		var result = dest.process(data);
 		expect(dest.dataContainer).toBe("hello@");
@@ -104,7 +102,7 @@ describe("DataStationBase", function() {
 		dest.addHandler("say", handler.bind(dest));
 		var dest2 = new DataStationBase();
 		dest2.addHandler("say", function(data){
-			this.dataContainer = data.content + "@";
+			this.dataContainer = data + "@";
 		}.bind(dest2));
 		dest2.addSource(source,"say");
 		source.dispatch(data);
@@ -125,11 +123,11 @@ describe("DataStationBase", function() {
 	});
 
 	it("should not dispatch anything if there's no return value", function(){
-		
+
 		//handler return nothing
 		dest.addHandler("say",function(data){
-			this.dataContainer = data.content + "!";
-		}.bind(dest));		
+			this.dataContainer = data + "!";
+		}.bind(dest));
 
 		var dest2 = new DataStationBase();
 		dest2.addHandler("say",function(data){
@@ -155,6 +153,5 @@ describe("DataStationBase", function() {
 		expect(dest.dataContainer).toBe("hello!");
 		expect(dest.gotData).toBe(true);
 	});
-	
-});
 
+});
