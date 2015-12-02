@@ -4,7 +4,6 @@
 
 	****************************************
 
-	DataStation is a core concept in PipeFlux.
 	An undirectional application is like a tree
 	and a data station is like a node of the tree.
 	A data station take the responsibility to receive

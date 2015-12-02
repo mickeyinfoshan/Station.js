@@ -18,27 +18,47 @@ describe("ModelStationBase", function() {
     receiver = new DataStationBase();
     receiver.oldValue = null;
     receiver.newValue = null;
-    receiver.addSource(myModel);
+    receiver.addSource(myModel, "MyModel.change");
   });
 
-  it("should set the new value and deliver to it's destination", function() {
+  it("should get the value", function() {
+    expect(myModel.get("value")).toBe(0);
+  });
 
-    receiver.addHandler("MyModel.change", function(data) {
+  it("the _setField method should work", function() {
+    myModel._setField({
+      field : "value",
+      value : 5
+    });
+    expect(myModel.get("value")).toBe(5);
+  });
 
-      console.log(JSON.stringify(data));
+  it("should set the value", function() {
+    myModel.set({
+      value : 5
+    });
+    expect(myModel.get("value")).toBe(5);
+  });
 
+  it("should get the correct className", function() {
+    expect(myModel.getClassName()).toBe("MyModel");
+  })
+
+  it("should deliver changes to it's destination", function() {
+
+    function handler(data) {
+      console.log(data);
       this.oldValue = data.prevStatus.value;
       this.newValue = data.instance.get("value");
-      this.sender = instance;
-    }.bind(receiver));
+      this.sender = data.instance;
+    }
+
+    receiver.addHandler("MyModel.change", handler.bind(receiver));
 
     myModel.set({
       value : 5
     });
 
-    var myModelValue = myModel.get("value");
-    expect(myModelValue).toBe(5);
-    expect(myModel.value).toBe(5);
     expect(receiver.oldValue).toBe(0);
     expect(receiver.newValue).toBe(5);
     expect(receiver.sender).toBe(myModel);
