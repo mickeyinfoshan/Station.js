@@ -3,8 +3,10 @@
 */
 'use strict'
 describe("ModelStationBase", function() {
-  var ModelStationBase = require("../../../src/ModelStation/ModelStationBase.js");
-  var DataStationBase = require("../../../src/DataStation/DataStationBase.js");
+
+  var DataStation = require("../../../index.js");
+  var DataStationBase = DataStation.DataStationBase;
+  var ModelStationBase = DataStation.ModelStationBase;
   class MyModel extends ModelStationBase {
     constructor() {
       super()

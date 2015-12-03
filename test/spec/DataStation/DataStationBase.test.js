@@ -4,7 +4,7 @@
 
 describe("DataStationBase", function() {
 
-	var DataStationBase = require("../../../src/DataStation/DataStationBase.js");
+	var DataStationBase = require("../../../index.js").DataStationBase;
 	var source;
 	var dest;
 	var data = {
