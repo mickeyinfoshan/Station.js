@@ -140,3 +140,6 @@ Set the value of the provided fields and dispatch the change. The information di
 ```
 
 To know more about the features, just read the test!
+
+## Questions?
+Feel free to open any issues. PRs are welcomed!
