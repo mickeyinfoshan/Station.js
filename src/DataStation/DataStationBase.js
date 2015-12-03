@@ -31,7 +31,6 @@
 
 'use strict';
 
-var assign = require("object-assign");
 var Emitter = require("events").EventEmitter;
 var Set = Set || require("es6-set");
 var Map = Map || require("es6-map");
