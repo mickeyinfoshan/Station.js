@@ -46,7 +46,7 @@ Remove a data handler for a certain data type.
 
 ### Example:
 ```
-  const {DataStationBase} = require("dataStation");
+  const {DataStationBase} = require("data-station");
 
 	var d1, d2, d3;
 	d1 = new DataStationBase();
@@ -104,7 +104,7 @@ Set the value of the provided fields and dispatch the change. The information di
 ### Example
 
 ```
-  const {DataStationBase, ModelStationBase} = require("dataStation");
+  const {DataStationBase, ModelStationBase} = require("data-station");
 
   //define the class of the model
   class MyModel extends ModelStationBase {
