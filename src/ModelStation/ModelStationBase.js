@@ -1,16 +1,33 @@
+/*
+	@author : Mickey
+	@email : mickey.in.foshan@gmail.com
+
+	****************************************
+
+	ModelStationBase, which is inherited from DataStationBase, is developed to
+  solve the problem that it's no easy job to detect the changes of a model.
+  Something similar to Observer pattern is used here. When the `set` method is called,
+  the instance will dispatch the information to all it's `destinations`(Observers).
+
+  For more information, read the test!
+
+*/
+
+
 'use strict';
 
 const DataStationBase = require("../DataStation/DataStationBase.js");
 
-var objectAssign = require("object-assign");
-
 class ModelStationBase extends DataStationBase {
+
+  //get the value of the field provided
   get(fieldName) {
     return this[fieldName];
   }
+
+  //change the value of the field provided and dispatch the information to its Observers
   set(newStatus) {
     var prevStatus = {};
-    objectAssign(prevStatus, newStatus);
     for(var field in newStatus) {
       prevStatus[field] = this.get(field);
       this._setField({
@@ -19,8 +36,9 @@ class ModelStationBase extends DataStationBase {
       });
     }
 
+    //dispatch the information to Observers
     this.dispatch({
-      $type : this.getClassName() + ".change",
+      $type : this._getClassName() + ".change",
       $content : {
         instance : this,
         prevStatus : prevStatus
@@ -28,11 +46,13 @@ class ModelStationBase extends DataStationBase {
     });
   }
 
+  //change the value of a certain field
   _setField(newStatus) {
     this[newStatus.field] = newStatus.value;
   }
 
-  getClassName() {
+  //get the class name of the instance
+  _getClassName() {
     return this.constructor.name;
   }
 }

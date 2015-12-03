@@ -4,7 +4,7 @@
 
 	****************************************
 
-	An undirectional application is like a tree
+	The structure of a complex application is like a tree
 	and a data station is like a node of the tree.
 	A data station take the responsibility to receive
 	data, process data, and then dispatch the processed

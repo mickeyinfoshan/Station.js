@@ -41,13 +41,12 @@ describe("ModelStationBase", function() {
   });
 
   it("should get the correct className", function() {
-    expect(myModel.getClassName()).toBe("MyModel");
+    expect(myModel._getClassName()).toBe("MyModel");
   })
 
   it("should deliver changes to it's destination", function() {
 
     function handler(data) {
-      console.log(data);
       this.oldValue = data.prevStatus.value;
       this.newValue = data.instance.get("value");
       this.sender = data.instance;
