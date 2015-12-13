@@ -5,7 +5,9 @@ In **Station.js**, we consider a node as a data station and a link as communicat
 
 ---
 
-## DataStationBase
+## Base
+
+***Base implements basic function of a data station.***
 
 DataStation is a core concept in Station.js.
 
@@ -25,12 +27,12 @@ A single data station won't do anything for you!
 
 ### Methods
 
-**addSource(source: DataStation [, $type: String]): void**
+**addSource(source: Base [, $type: String]): void**
  Add a data station as a source. When the source dispatch data of such type, this data station will get the data. If no type provided, a default type will be used.
 
-**removeSource(source: DataStation [, $type: String])** No longer receive data of the type from that station. If no type provided, remove all data types, which means this data station will not receive any from the source anymore.
+**removeSource(source: Base [, $type: String])** No longer receive data of the type from that station. If no type provided, remove all data types, which means this data station will not receive any from the source anymore.
 
-**hasSource(source: DataStation [, $type: String]): boolean** Determine whether receiving data of the type from the source. If no type provided, determine whether receiving any data from the source.
+**hasSource(source: Base [, $type: String]): boolean** Determine whether receiving data of the type from the source. If no type provided, determine whether receiving any data from the source.
 
 **getSourceCount(): Number** Return the number of sources.
 
@@ -46,12 +48,12 @@ Remove a data handler for a certain data type.
 
 ### Example:
 ```
-  const {DataStationBase} = require("data-station");
+  const {Base} = require("data-station");
 
 	var d1, d2, d3;
-	d1 = new DataStationBase();
-	d2 = new DataStationBase();
-	d2 = new DataStationBase();
+	d1 = new Base();
+	d2 = new Base();
+	d2 = new Base();
 
 	d2.name = "D2";
 	d3.name = "D3";
@@ -72,7 +74,8 @@ Remove a data handler for a certain data type.
 
 	//the data delivered through the chain
 	var data = {
-		$type : "data"
+		$type : "data",
+    $content : null,
 	};
 
 	d1.dispatch(data);
@@ -86,9 +89,9 @@ Remove a data handler for a certain data type.
 	*/
 ```
 
-## ModelStationBase
+## Model
 
-ModelStationBase, which is inherited from DataStationBase, is developed to solve the problem that it's no easy job to detect the changes of a model.
+Model, which is inherited from Base, is developed to solve the problem that it's no easy job to detect the changes of a model.
 Something similar to Observer pattern is used here. When the `set` method is called, the instance will dispatch the information to all it's `destinations`(Observers).
 
 ### Methods
@@ -104,10 +107,10 @@ Set the value of the provided fields and dispatch the change. The information di
 ### Example
 
 ```
-  const {DataStationBase, ModelStationBase} = require("data-station");
+  const {Base, Model} = require("data-station");
 
   //define the class of the model
-  class MyModel extends ModelStationBase {
+  class MyModel extends Model {
     constructor() {
       super();
       this.foo1 = 0;
@@ -116,7 +119,7 @@ Set the value of the provided fields and dispatch the change. The information di
   }
 
   var myModel = new MyModel();
-  var observer = new DataStationBase(); //A simple DataStation can be the observer.
+  var observer = new Base(); //A simple data station, such as Base, can be the observer.
   observer.addSource(myModel, "MyModel.change"); //observe the model instance. Be careful, the type of the data source should be `${YourModelClassName}.change`.
 
   observer.addHandler("MyModel.change", function(data) {

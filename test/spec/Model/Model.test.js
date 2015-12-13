@@ -2,12 +2,12 @@
 	tests for ModelStationBase
 */
 'use strict'
-describe("ModelStationBase", function() {
+describe("Model", function() {
 
   var DataStation = require("../../../index.js");
-  var DataStationBase = DataStation.DataStationBase;
-  var ModelStationBase = DataStation.ModelStationBase;
-  class MyModel extends ModelStationBase {
+  var Base = DataStation.Base;
+  var Model = DataStation.Model;
+  class MyModel extends Model {
     constructor() {
       super()
       this.value = 0;
@@ -17,7 +17,7 @@ describe("ModelStationBase", function() {
   var receiver;
   beforeEach(()=>{
     myModel = new MyModel();
-    receiver = new DataStationBase();
+    receiver = new Base();
     receiver.oldValue = null;
     receiver.newValue = null;
     receiver.addSource(myModel, "MyModel.change");

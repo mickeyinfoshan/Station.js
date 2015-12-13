@@ -1,10 +1,10 @@
 /*
-	tests for DataStationBase
+	tests for Base
 */
 
-describe("DataStationBase", function() {
+describe("Base", function() {
 
-	var DataStationBase = require("../../../index.js").DataStationBase;
+	var Base = require("../../../index.js").Base;
 	var source;
 	var dest;
 	var data = {
@@ -19,8 +19,8 @@ describe("DataStationBase", function() {
 	};
 
 	beforeEach(function(){
-		source = new DataStationBase();
-		dest = new DataStationBase();
+		source = new Base();
+		dest = new Base();
 		dest.addSource(source,"say");
 	});
 
@@ -90,7 +90,7 @@ describe("DataStationBase", function() {
 	});
 
 	it("should not deliver the data to another data station which is not a destionation",function(){
-		var dest2 = new DataStationBase();
+		var dest2 = new Base();
 		dest2.addHandler("say", function(data){
 			this.hasData = true;
 		}.bind(dest2));
@@ -100,7 +100,7 @@ describe("DataStationBase", function() {
 
 	it("should dispatch the data to its destinations if the handler has return value", function(){
 		dest.addHandler("say", handler.bind(dest));
-		var dest2 = new DataStationBase();
+		var dest2 = new Base();
 		dest2.addHandler("say", function(data){
 			this.dataContainer = data + "@";
 		}.bind(dest2));
@@ -112,7 +112,7 @@ describe("DataStationBase", function() {
 
 	it("should dispatch the processed data to its desinations", function(){
 		dest.addHandler("say",handler.bind(dest));
-		var dest2 = new DataStationBase();
+		var dest2 = new Base();
 		dest2.addHandler("say", function(data){
 			this.hasData = true;
 		}.bind(dest2));
@@ -129,7 +129,7 @@ describe("DataStationBase", function() {
 			this.dataContainer = data + "!";
 		}.bind(dest));
 
-		var dest2 = new DataStationBase();
+		var dest2 = new Base();
 		dest2.addHandler("say",function(data){
 			this.hasData = true;
 		}.bind(dest2));

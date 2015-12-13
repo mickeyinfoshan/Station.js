@@ -1,7 +1,7 @@
-var DataStationBase = require("./src/DataStation/DataStationBase.js");
-var ModelStationBase = require("./src/ModelStation/ModelStationBase.js");
+var Base = require("./src/Base/Base.js");
+var Model = require("./src/Model/Model.js");
 
 module.exports = {
-	DataStationBase : DataStationBase,
-	ModelStationBase : ModelStationBase
+	Base : Base,
+	Model : Model
 };

@@ -34,7 +34,7 @@
 var Emitter = require("events").EventEmitter;
 var DEFAULT_TYPE = require("../Constants/constants.js").DEFAULT_TYPE;
 
-class DataStationBase {
+class Base {
 
 	constructor() {
 		this.$sources = new Map();
@@ -195,4 +195,4 @@ class DataStationBase {
 	}
 }
 
-module.exports = DataStationBase;
+module.exports = Base;
