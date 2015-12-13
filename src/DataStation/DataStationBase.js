@@ -32,8 +32,6 @@
 'use strict';
 
 var Emitter = require("events").EventEmitter;
-var Set = Set || require("es6-set");
-var Map = Map || require("es6-map");
 var DEFAULT_TYPE = require("../Constants/constants.js").DEFAULT_TYPE;
 
 class DataStationBase {

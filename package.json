@@ -1,15 +1,13 @@
 {
   "name": "data-station",
   "description": "components for flux architecture ",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "keywords": [
     "dataStation",
     "dispatcher",
     "undirectional"
   ],
   "dependencies": {
-    "es6-map": "^0.1.3",
-    "es6-set": "^0.1.3",
     "events": "^1.1.0"
   },
   "license": "MIT",
