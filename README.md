@@ -36,7 +36,7 @@ A single data station won't do anything for you!
 
 **getSourceCount(): Number** Return the number of sources.
 
-**addHandler(type : String, handler : Function): void**
+**addHandler(handler : Function [, $type: String]): void**
 Add a data handler for a certain data type. The handler can have a return value. If so, this data station will dispatch the return value to all its destination automatically. There are two things need to be mentioned here. First, if the handler is a method of an object which uses `this`, you need to `bind` the correct `this` to the handler or the handler will not work as your expectation. Second, your return value should be an object or it will throw a type error. You can set the data type of your return value by setting the `$type` attribute. If you don't, the data type this handler deal with will be used.
 
 **removeHandler($type : String): void**
@@ -69,8 +69,8 @@ Remove a data handler for a certain data type.
 		return data;		                                                                      //just return the value
 	}
 
-	d2.addHandler("data", gotData.bind(d2));
-	d3.addHandler("data", gotData.bind(d3));
+	d2.addHandler(gotData.bind(d2), "data");
+	d3.addHandler(gotData.bind(d3), "data");
 
 	//the data delivered through the chain
 	var data = {
@@ -122,7 +122,7 @@ Set the value of the provided fields and dispatch the change. The information di
   var observer = new Base(); //A simple data station, such as Base, can be the observer.
   observer.addSource(myModel, "MyModel.change"); //observe the model instance. Be careful, the type of the data source should be `${YourModelClassName}.change`.
 
-  observer.addHandler("MyModel.change", function(data) {
+  observer.addHandler(function(data) {
 
     //data.instance is the instance which dispatched its change.
     //data.prevStatus includes the changed fields and the changed values.
@@ -131,7 +131,7 @@ Set the value of the provided fields and dispatch the change. The information di
       console.log(`field ${field} was changed from ${prevStatus[field]} to ${data.instance.get(field)}`); // just log the change
     }
 
-  });
+  }, "MyModel.change");
 
   myModel.set({
       foo1 : 1,

@@ -51,19 +51,19 @@ describe("Base", function() {
 	});
 
 	it("should have a corresponding handler after adding one to it", function(){
-		dest.addHandler("say", handler);
+		dest.addHandler(handler, "say");
 		expect(dest.hasHandler("say")).toBe(true);
 		//source.dispatch(data);
 	});
 
 	it("should not have the handler that has been removed", function(){
-		dest.addHandler("say",handler);
+		dest.addHandler(handler, "say");
 		dest.removeHandler("say");
 		expect(dest.hasHandler("say")).toBe(false);
 	});
 
 	it("should choose the corresponding handler and process it", function(){
-		dest.addHandler("say", handler.bind(dest));
+		dest.addHandler(handler.bind(dest), "say");
 		var result = dest.process(data);
 		expect(dest.dataContainer).toBe("hello!");
 	});
@@ -75,35 +75,35 @@ describe("Base", function() {
 	});
 
 	it("should override the handler of the same _type", function(){
-		dest.addHandler("say", handler.bind(dest));
-		dest.addHandler("say", function(data){
+		dest.addHandler(handler.bind(dest),"say");
+		dest.addHandler(function(data){
 			this.dataContainer = data + "@";
-		}.bind(dest));
+		}.bind(dest), "say");
 		var result = dest.process(data);
 		expect(dest.dataContainer).toBe("hello@");
 	});
 
 	it("should deliver the data to its destination", function(){
-		dest.addHandler("say", handler.bind(dest));
+		dest.addHandler(handler.bind(dest), "say");
 		source.deliver(data,dest);
 		expect(dest.dataContainer).toBe("hello!");
 	});
 
 	it("should not deliver the data to another data station which is not a destionation",function(){
 		var dest2 = new Base();
-		dest2.addHandler("say", function(data){
+		dest2.addHandler(function(data){
 			this.hasData = true;
 		}.bind(dest2));
 		source.deliver(data, dest2);
 		expect(dest2.hasData).not.toBe(true);
-	});
+	}, "say");
 
 	it("should dispatch the data to its destinations if the handler has return value", function(){
-		dest.addHandler("say", handler.bind(dest));
+		dest.addHandler(handler.bind(dest), "say");
 		var dest2 = new Base();
-		dest2.addHandler("say", function(data){
+		dest2.addHandler(function(data){
 			this.dataContainer = data + "@";
-		}.bind(dest2));
+		}.bind(dest2), "say");
 		dest2.addSource(source,"say");
 		source.dispatch(data);
 		expect(dest.dataContainer).toBe("hello!");
@@ -111,11 +111,11 @@ describe("Base", function() {
 	});
 
 	it("should dispatch the processed data to its desinations", function(){
-		dest.addHandler("say",handler.bind(dest));
+		dest.addHandler(handler.bind(dest), "say");
 		var dest2 = new Base();
-		dest2.addHandler("say", function(data){
+		dest2.addHandler(function(data){
 			this.hasData = true;
-		}.bind(dest2));
+		}.bind(dest2), "say");
 		dest2.addSource(dest,"say");
 		source.dispatch(data);
 		expect(dest.dataContainer).toBe("hello!");
@@ -125,14 +125,14 @@ describe("Base", function() {
 	it("should not dispatch anything if there's no return value", function(){
 
 		//handler return nothing
-		dest.addHandler("say",function(data){
+		dest.addHandler(function(data){
 			this.dataContainer = data + "!";
-		}.bind(dest));
+		}.bind(dest), "say");
 
 		var dest2 = new Base();
-		dest2.addHandler("say",function(data){
+		dest2.addHandler(function(data){
 			this.hasData = true;
-		}.bind(dest2));
+		}.bind(dest2), "say");
 		dest2.addSource(dest,"say");
 
 		source.dispatch(data);
@@ -147,7 +147,7 @@ describe("Base", function() {
 		dest.addHandler(function(){
 			this.gotData = true;
 		}.bind(dest));
-		dest.addHandler("say",handler.bind(dest));
+		dest.addHandler(handler.bind(dest), "say");
 		source.dispatch({data:"ccc"});
 		source.dispatch(data);
 		expect(dest.dataContainer).toBe("hello!");

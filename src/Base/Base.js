@@ -123,7 +123,7 @@ class Base {
 		return types.get($type);
 	}
 
-	addHandler($type,handler) {
+	addHandler(handler, $type) {
 		//adding the handler of data type existed
 		//will override the origin one
 		//`this` needs to be binded when the handler use `this` ,
@@ -135,13 +135,10 @@ class Base {
 		//			...
 		// 		}
 		// 	};
-		// 	var ds = new DataStationBase();
+		// 	var ds = new Base();
 		// 	ds.addHandler(foo.func);			//NOT OK! foo.func won't work as you expect
 		// 	ds.addHandler(foo.func.bind(foo));  //OK
-		if(typeof $type === "function") {
-			handler = $type;
-			$type = undefined;
-		}
+
 		if($type == undefined) {
 			$type = DEFAULT_TYPE;
 		}

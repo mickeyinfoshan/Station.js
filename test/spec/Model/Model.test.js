@@ -54,7 +54,7 @@ describe("Model", function() {
       this.sender = data.instance;
     }
 
-    receiver.addHandler("MyModel.change", handler.bind(receiver));
+    receiver.addHandler(handler.bind(receiver), "MyModel.change");
 
     myModel.set({
       value : 5
