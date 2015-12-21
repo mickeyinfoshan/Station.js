@@ -1,5 +1,5 @@
 /*
-	tests for ModelStationBase
+	tests for Model
 */
 'use strict'
 describe("Model", function() {
