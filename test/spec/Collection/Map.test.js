@@ -35,7 +35,6 @@ describe("DSMap", function() {
     }.bind(observer), "myItemKey.set");
 
     observer.addHandler(function(data) {
-      this.deleteSuccess = data.success;
       this.deletedInstance = data.instance;
     }.bind(observer), "myItemKey.delete");
 

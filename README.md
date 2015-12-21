@@ -89,6 +89,7 @@ Remove a data handler for a certain data type.
 	*/
 ```
 
+
 ## Model
 
 Model, which is inherited from Base, is developed to solve the problem that it's no easy job to detect the changes of a model.
@@ -145,6 +146,124 @@ Set the value of the provided fields and dispatch the change. The information di
   */
 
 ```
+
+
+## DSSet
+
+`DSSet` is inherited from ES6's `Set`, which means `DSSet` has all methods that `Set` has.
+
+When an item is added or deleted, the `DSSet` instance will inform all its observers what happened.
+You can read the example below to figure how to use it.
+
+### Extra Method
+
+**getDataStation() : Base**   
+Get the dataStation to listen to.
+
+### Example
+
+```
+  var DataStation = require("../../../index");
+  var Base = DataStation.Base;
+  var DSSet = DataStation.DSSet;
+  var Model = DataStation.Model;
+
+  class MyModel extends Model {
+    constructor(name) {
+      super()
+      this.name = name;
+    }
+  }
+
+  var mySet;
+  var observer;
+  var item1;
+
+  mySet = new DSSet();
+  observer = new Base();
+  item1 = new MyModel("item1");
+
+  observer.addSource(mySet.getDataStation(), "MyModel.add");
+  observer.addSource(mySet.getDataStation(), "MyModel.delete");
+
+  observer.addHandler(function(data) {
+    console.log(`${data.instance.name} was added`);
+  }.bind(observer), "MyModel.add");
+
+  observer.addHandler(function(data) {
+    console.log(`${data.instance.name} was deleted`);
+  }.bind(observer), "MyModel.delete");
+
+  mySet.add(item1);
+  mySet.delete(item1);
+
+  /*
+    OUTPUT:
+      item1 was added.
+      item1 was deleted.
+  */
+
+```
+
+
+## DSMap
+
+Similar to `DSSet`, `DSMap` is inherited from ES6's `Map`.
+
+When a key is set or deleted, the `DSMap` instance will inform all its observers what happened.
+You can read the example below to figure how to use it.
+
+### Extra Method
+
+**getDataStation() : Base**   
+Get the dataStation to listen to.
+
+### Example
+
+```
+  var DataStation = require("../../../index");
+  var Base = DataStation.Base;
+  var DSMap = DataStation.DSMap;
+  var Model = DataStation.Model;
+
+  class MyModel extends Model {
+    constructor(name) {
+      super()
+      this.name = name;
+    }
+  }
+
+  var myMap;
+  var observer;
+  var item1;
+
+  myMap = new DSMap();
+  observer = new Base();
+  item1 = new MyModel("item1");
+
+  observer.addSource(myMap.getDataStation(), "myItemKey.set");
+  observer.addSource(myMap.getDataStation(), "myItemKey.delete");
+
+  observer.addHandler(function(data) {
+    console.log(`'myItemKey' was set to ${data.instance.name}`);
+  }.bind(observer), "myItemKey.set");
+
+  observer.addHandler(function(data) {
+    console.log(`${data.instance.name} was deleted`);
+  }.bind(observer), "myItemKey.delete");
+
+  /*
+    OUTPUT:
+      'myItemKey' was set to item1.
+      item1 was deleted.
+  */
+
+```
+
+
+----------------
+
+## More Features
 
 To know more about the features, just read the test!
 
