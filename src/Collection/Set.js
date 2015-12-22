@@ -10,6 +10,9 @@ class DSSet extends Set {
   }
 
   add(item) {
+    if(this.has(item)) {
+      return;
+    }
     super.add(item);
     var itemClassName = item.constructor.name;
     this.getDataStation().dispatch({

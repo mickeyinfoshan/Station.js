@@ -195,6 +195,7 @@ Get the dataStation to listen to.
   }.bind(observer), "MyModel.delete");
 
   mySet.add(item1);
+  mySet.add(item1);  //won't invoke the handler
   mySet.delete(item1);
 
   /*
@@ -251,6 +252,9 @@ Get the dataStation to listen to.
   observer.addHandler(function(data) {
     console.log(`${data.instance.name} was deleted`);
   }.bind(observer), "myItemKey.delete");
+
+  myMap.set("myItemKey", item1);
+  myMap.delete("myItemKey");
 
   /*
     OUTPUT:

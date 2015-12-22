@@ -50,6 +50,24 @@ describe("DSSet", function() {
 
   });
 
+  it("should inform the observer for once", function() {
+
+    observer.addCounter = 0;
+    //override the handler
+    observer.addHandler(function(data) {
+      this.addCounter++;
+    }.bind(observer), "MyModel.add")
+
+    mySet.add(item1);
+
+    expect(observer.addCounter).toBe(1);
+
+    mySet.add(item1);
+
+    expect(observer.addCounter).toBe(1);
+
+  });
+
   it("should delete the item and inform the observer", function() {
 
     var deleteResult2 = mySet.delete(item2);
