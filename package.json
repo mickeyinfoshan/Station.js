@@ -1,7 +1,7 @@
 {
   "name": "data-station",
   "description": "components for flux architecture ",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "keywords": [
     "dataStation",
     "dispatcher",
